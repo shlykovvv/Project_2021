@@ -7,7 +7,6 @@ import math
 FPS = 600  # TODO: узнать максимальное адекватное
 w = 600
 h = 400
-LIGHT = (170, 170, 170)
 DARK = (50, 50, 50)
 
 RED = (250, 20, 20)
@@ -21,16 +20,17 @@ PINK = (250, 150, 210)
 WHITE = (200, 200, 200)
 COLORS = [RED, BROWN, BLUE_SEA, BLUE, PURPLE, GREEN, GREY, PINK, WHITE]
 BG = (20, 55, 75, 255)
-LINK_COLOR = (255, 230, 0, 100)
 
 NUMBER_OF_TYPES = 3  # TODO: добавить scrollbar
 NODE_COUNT = 250  # TODO: добавить scrollbar
+SIMULATIONS_PER_FRAME = 2  # TODO: добавить scrollbar
+
+DRAW_CONNECTIONS = True  # TODO: добавить галочку
 
 NODE_RADIUS = 5
 MAX_DIST = 100
 MAX_DIST2 = MAX_DIST * MAX_DIST
 SPEED = 4
-SIMULATIONS_PER_FRAME = 1  # TODO: добавить scrollbar
 BORDER = 30
 fw = w // MAX_DIST + 1
 fh = h // MAX_DIST + 1
@@ -58,9 +58,9 @@ generateRules()
 # LINKS = [1, 1]
 # LINKS_POSSIBLE = [[0, 0], [0, 0]]
 # COUPLING = [[-1, 1], [-1, 0]]
-# print(LINKS)
-# print(LINKS_POSSIBLE)
-# print(COUPLING)
+print(LINKS)
+print(LINKS_POSSIBLE)
+print(COUPLING)
 
 fields = [0] * fw
 for i in range(fw):
@@ -236,6 +236,10 @@ def model():
                     links.append(Link(a, particleToLink))
 
 
+def Calc_coord_for_link(z1, z2):
+    return z1 + (z2 - z1) * NODE_RADIUS / distance
+
+
 # put particles randomly
 for i in range(NODE_COUNT):
     add(random.randint(0, NUMBER_OF_TYPES - 1), random.random() * w, random.random() * h);
@@ -259,9 +263,14 @@ while not finished:
         for j in range(fh):
             for a in fields[i][j]:
                 pygame.draw.circle(screen, a.color, (a.x, a.y), NODE_RADIUS)
-    # links.append(Link(fields[1][1][0], fields[4][4][0]))
-    for l in links:
-        pygame.draw.line(screen, LINK_COLOR, (l.a.x, l.a.y), (l.b.x, l.b.y))
+    if DRAW_CONNECTIONS:
+        for l in links:
+            distance = ((l.b.x - l.a.x) ** 2 + (l.b.y - l.a.y) ** 2) ** 0.5
+            link_color = ((l.a.color[0] + l.b.color[0]) / 2, (l.a.color[1] + l.b.color[1]) / 2,
+                          (l.a.color[2] + l.b.color[2]) / 2)  # TODO: градиент цвета
+            pygame.draw.line(screen, link_color, (Calc_coord_for_link(l.a.x, l.b.x), Calc_coord_for_link(l.a.y, l.b.y)),
+                             (Calc_coord_for_link(l.b.x, l.a.x), Calc_coord_for_link(l.b.y, l.a.y)), math.floor(NODE_RADIUS / 2))
+            # pygame.draw.line(screen, link_color, (l.a.x, l.a.y), (l.b.x, l.b.y), math.floor(NODE_RADIUS / 2))
 
     pygame.display.update()
 pygame.quit()
