@@ -21,9 +21,9 @@ WHITE = (200, 200, 200)
 COLORS = [RED, BROWN, BLUE_SEA, BLUE, PURPLE, GREEN, GREY, PINK, WHITE]
 BG = (20, 55, 75, 255)
 
-NUMBER_OF_TYPES = 3  # TODO: добавить scrollbar
-NODE_COUNT = 250  # TODO: добавить scrollbar
-SIMULATIONS_PER_FRAME = 2  # TODO: добавить scrollbar
+NUMBER_OF_TYPES = 3  # TODO: добавить контроллер-scrollbar
+NODE_COUNT = 250  # TODO: добавить контроллер-scrollbar
+SIMULATIONS_PER_FRAME = 2  # TODO: добавить контроллер-scrollbar
 
 DRAW_CONNECTIONS = True  # TODO: добавить галочку
 
@@ -35,39 +35,6 @@ BORDER = 30
 fw = w // MAX_DIST + 1
 fh = h // MAX_DIST + 1
 LINK_FORCE = -0.015
-
-LINKS = []
-LINKS_POSSIBLE = []
-COUPLING = []
-
-
-def generateRules():
-    for i in range(NUMBER_OF_TYPES):
-        LINKS.append(math.floor(random.random() * 4))
-        COUPLING.append([])
-        LINKS_POSSIBLE.append([])
-        for j in range(NUMBER_OF_TYPES):
-            LINKS_POSSIBLE[i].append(math.floor(random.random() * 4))
-            COUPLING[i].append(math.floor(random.random() * 3 - 1))
-    return LINKS, LINKS_POSSIBLE, COUPLING
-
-
-# array for dividing scene into parts to reduce complexity
-generateRules()
-
-# LINKS = [1, 1]
-# LINKS_POSSIBLE = [[0, 0], [0, 0]]
-# COUPLING = [[-1, 1], [-1, 0]]
-print(LINKS)
-print(LINKS_POSSIBLE)
-print(COUPLING)
-
-fields = [0] * fw
-for i in range(fw):
-    fields[i] = [0] * fh
-    for j in range(fh):
-        fields[i][j] = []
-links = []
 
 
 class Link:
@@ -88,10 +55,41 @@ class Particle:
         self.color = COLORS[self.type]
 
 
+def generateRules():
+    global LINKS, LINKS_POSSIBLE, COUPLING
+    LINKS = []
+    LINKS_POSSIBLE = []
+    COUPLING = []
+    for i in range(NUMBER_OF_TYPES):
+        LINKS.append(math.floor(random.random() * 4))
+        COUPLING.append([])
+        LINKS_POSSIBLE.append([])
+        for j in range(NUMBER_OF_TYPES):
+            LINKS_POSSIBLE[i].append(math.floor(random.random() * 4))
+            COUPLING[i].append(math.floor(random.random() * 3 - 1))
+    print(LINKS)
+    print(LINKS_POSSIBLE)
+    print(COUPLING)
+
+
 def add(type, x, y):
     p = Particle(type, x, y)
     fields[round(p.x / MAX_DIST)][round(p.y / MAX_DIST)].append(p)
     return p
+
+
+def new_world():
+    generateRules()
+    global fields, links
+    fields = [0] * fw  # array for dividing scene into parts to reduce complexity
+    for i in range(fw):
+        fields[i] = [0] * fh
+        for j in range(fh):
+            fields[i][j] = []
+    links = []
+    for i in range(NODE_COUNT):  # put particles randomly
+        add(random.randint(0, NUMBER_OF_TYPES - 1), random.random() * (w - 2 * NODE_RADIUS) + NUMBER_OF_TYPES,
+            random.random() * (h - 2 * NODE_RADIUS) + NUMBER_OF_TYPES)
 
 
 def applyForce(a, b):
@@ -240,22 +238,28 @@ def Calc_coord_for_link(z1, z2):
     return z1 + (z2 - z1) * NODE_RADIUS / distance
 
 
-# put particles randomly
-for i in range(NODE_COUNT):
-    add(random.randint(0, NUMBER_OF_TYPES - 1), random.random() * w, random.random() * h);
-
+new_world()
 # view
 pygame.init()
-screen = pygame.display.set_mode((w, h))
+screen = pygame.display.set_mode((w + 150, h))  # TODO: допокно для кнопок и регуляторов, нужно его улучшить и сделать красивым
 pygame.display.update()
 clock = pygame.time.Clock()
 finished = False
 
+smallfont = pygame.font.SysFont('Corbel', int(w / 40))
+text = smallfont.render('Create new world', True, (0, 0, 0))  # TODO: сделать кнопку красивой
+color_light = (250, 250, 250)
+color_dark = (170, 170, 170)
+
 while not finished:
     clock.tick(FPS)
+    mouse = pygame.mouse.get_pos()
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             finished = True
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if mouse[0] >= w and mouse[1] <= h / 5:
+                new_world()
     for i in range(SIMULATIONS_PER_FRAME):
         model()
     pygame.draw.rect(screen, DARK, (0, 0, w, h))
@@ -267,10 +271,13 @@ while not finished:
         for l in links:
             distance = ((l.b.x - l.a.x) ** 2 + (l.b.y - l.a.y) ** 2) ** 0.5
             link_color = ((l.a.color[0] + l.b.color[0]) / 2, (l.a.color[1] + l.b.color[1]) / 2,
-                          (l.a.color[2] + l.b.color[2]) / 2)  # TODO: градиент цвета
+                          (l.a.color[2] + l.b.color[2]) / 2)  # TODO: мб градиент цвета
             pygame.draw.line(screen, link_color, (Calc_coord_for_link(l.a.x, l.b.x), Calc_coord_for_link(l.a.y, l.b.y)),
                              (Calc_coord_for_link(l.b.x, l.a.x), Calc_coord_for_link(l.b.y, l.a.y)), math.floor(NODE_RADIUS / 2))
-            # pygame.draw.line(screen, link_color, (l.a.x, l.a.y), (l.b.x, l.b.y), math.floor(NODE_RADIUS / 2))
-
+    if mouse[0] >= w and mouse[1] <= h / 5:
+        pygame.draw.rect(screen, color_light, [w, 0, w + 150, h / 5])
+    else:
+        pygame.draw.rect(screen, color_dark, [w, 0, w + 150, h / 5])
+    screen.blit(text, (w + 20, h / 10 - 5))
     pygame.display.update()
 pygame.quit()
