@@ -4,52 +4,64 @@ import sys
 import random
 import math
 
-
-FPS = 60
-w = 800
-h = 500
+FPS = 600  # TODO: узнать максимальное адекватное
+w = 600
+h = 400
 LIGHT = (170, 170, 170)
 DARK = (50, 50, 50)
 
 RED = (250, 20, 20)
-YELLOW = (200, 140, 100)
-BLUE = (80, 170, 140)
-COLORS = [RED, YELLOW, BLUE]
+BROWN = (200, 140, 100)
+BLUE_SEA = (80, 170, 140)
+BLUE = (0, 150, 230)
+PURPLE = (130, 0, 200)
+GREEN = (0, 128, 0)
+GREY = (130, 130, 130)
+PINK = (250, 150, 210)
+WHITE = (200, 200, 200)
+COLORS = [RED, BROWN, BLUE_SEA, BLUE, PURPLE, GREEN, GREY, PINK, WHITE]
 BG = (20, 55, 75, 255)
 LINK_COLOR = (255, 230, 0, 100)
 
+NUMBER_OF_TYPES = 3  # TODO: добавить scrollbar
+NODE_COUNT = 250  # TODO: добавить scrollbar
+
 NODE_RADIUS = 5
-NODE_COUNT = 300
 MAX_DIST = 100
 MAX_DIST2 = MAX_DIST * MAX_DIST
 SPEED = 4
-SKIP_FRAMES = 3
+SIMULATIONS_PER_FRAME = 1  # TODO: добавить scrollbar
 BORDER = 30
 fw = w // MAX_DIST + 1
 fh = h // MAX_DIST + 1
 LINK_FORCE = -0.015
 
-COUPLING = [] #[[1, 1, -1], [1, 1, 1], [1, 1, 1]]
-LINKS = [] #[1, 3, 2]
-LINKS_POSSIBLE = [] #[[0, 1, 1], [1, 2, 1], [1, 1, 2]]
+LINKS = []
+LINKS_POSSIBLE = []
+COUPLING = []
+
 
 def generateRules():
-    RULE_SIZE = 3
-    # LINKS = []
-    # COUPLING = []
-    # LINKS_POSSIBLE = []
-    for i in range(RULE_SIZE):
-      LINKS.append(math.floor(random.random() * 4))
-      COUPLING.append([])
-      LINKS_POSSIBLE.append([])
-      for j in range(RULE_SIZE):
-        COUPLING[i].append(math.floor(random.random() * 3 - 1));
-        LINKS_POSSIBLE[i].append(math.floor(random.random() * 4))
-    return LINKS, COUPLING, LINKS_POSSIBLE
+    for i in range(NUMBER_OF_TYPES):
+        LINKS.append(math.floor(random.random() * 4))
+        COUPLING.append([])
+        LINKS_POSSIBLE.append([])
+        for j in range(NUMBER_OF_TYPES):
+            LINKS_POSSIBLE[i].append(math.floor(random.random() * 4))
+            COUPLING[i].append(math.floor(random.random() * 3 - 1))
+    return LINKS, LINKS_POSSIBLE, COUPLING
 
 
 # array for dividing scene into parts to reduce complexity
 generateRules()
+
+# LINKS = [1, 1]
+# LINKS_POSSIBLE = [[0, 0], [0, 0]]
+# COUPLING = [[-1, 1], [-1, 0]]
+# print(LINKS)
+# print(LINKS_POSSIBLE)
+# print(COUPLING)
+
 fields = [0] * fw
 for i in range(fw):
     fields[i] = [0] * fh
@@ -129,8 +141,8 @@ def model():
                 a.y += a.sy
                 a.sx *= 0.98
                 a.sy *= 0.98
-                #velocity normalization
-                #idk if it is still necessary
+                # velocity normalization
+                # idk if it is still necessary
                 magnitude = math.sqrt(a.sx * a.sx + a.sy * a.sy)
                 if magnitude > 1:
                     a.sx /= magnitude
@@ -224,13 +236,9 @@ def model():
                     links.append(Link(a, particleToLink))
 
 
-
-
-
 # put particles randomly
 for i in range(NODE_COUNT):
-    add(random.randint(0, 2), random.random() * w, random.random() * h);
-
+    add(random.randint(0, NUMBER_OF_TYPES - 1), random.random() * w, random.random() * h);
 
 # view
 pygame.init()
@@ -239,13 +247,13 @@ pygame.display.update()
 clock = pygame.time.Clock()
 finished = False
 
-
 while not finished:
     clock.tick(FPS)
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             finished = True
-    model()
+    for i in range(SIMULATIONS_PER_FRAME):
+        model()
     pygame.draw.rect(screen, DARK, (0, 0, w, h))
     for i in range(fw):
         for j in range(fh):
