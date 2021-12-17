@@ -25,6 +25,7 @@ class Particle:
         self.links = 0
         self.bonds = []
         self.color = COLORS[self.type]
+        fields[round(self.x / MAX_DIST)][round(self.y / MAX_DIST)].append(self)
 
 
 LINKS, LINKS_POSSIBLE, COUPLING = [], [], []
@@ -46,10 +47,10 @@ def generate_rules():
     print(COUPLING)
 
 
-def add_particle(type, x, y):
-    p = Particle(type, x, y)
-    fields[round(p.x / MAX_DIST)][round(p.y / MAX_DIST)].append(p)
-    return p
+# def add_particle(type, x, y):
+#     p = Particle(type, x, y)
+#     fields[round(p.x / MAX_DIST)][round(p.y / MAX_DIST)].append(p)
+#     return p
 
 
 def create_new_world():
@@ -62,7 +63,7 @@ def create_new_world():
             fields[i][j] = []
     links = []
     for i in range(NODE_COUNT):  # put particles randomly
-        add_particle(random.randint(0, NUMBER_OF_TYPES - 1), random.random() * (WIDTH - 2 * NODE_RADIUS) +
+        Particle(random.randint(0, NUMBER_OF_TYPES - 1), random.random() * (WIDTH - 2 * NODE_RADIUS) +
                      NUMBER_OF_TYPES, random.random() * (HEIGHT - 2 * NODE_RADIUS) + NUMBER_OF_TYPES)
 
 

@@ -22,7 +22,7 @@ while not finished:
             finished = True
         if event.type == pygame.MOUSEBUTTONDOWN:
             if mouse[0] <= WIDTH and mouse[1] <= HEIGHT:
-                model.add_particle(ui.type_for_click, mouse[0], mouse[1])
+                model.Particle(ui.type_for_click, mouse[0], mouse[1])
             if mouse[0] >= WIDTH and mouse[1] <= HEIGHT / 5:
                 model.create_new_world()
 
