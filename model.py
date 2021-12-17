@@ -1,16 +1,10 @@
 import random
 import math
 from ui import NUMBER_OF_TYPES, NODE_COUNT
-from view import w, h
-import color
+from constants import COLORS, w, h, NODE_RADIUS, LINK_FORCE, SPEED, MAX_DIST, BORDER
 
 
-NODE_RADIUS = 5  # TODO: в теории можно добавить регулятор
-LINK_FORCE = -0.015  # TODO: в теории можно добавить регулятор
-SPEED = 4  # TODO: в теории можно добавить регулятор
-MAX_DIST = 100
 MAX_DIST2 = MAX_DIST * MAX_DIST
-BORDER = 30
 fw = w // MAX_DIST + 1
 fh = h // MAX_DIST + 1
 
@@ -30,7 +24,11 @@ class Particle:
         self.sy = 0
         self.links = 0
         self.bonds = []
-        self.color = color.COLORS[self.type]
+        self.color = COLORS[self.type]
+
+
+LINKS, LINKS_POSSIBLE, COUPLING = [], [], []
+fields, links = [], []
 
 
 def generate_rules():

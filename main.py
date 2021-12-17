@@ -1,8 +1,7 @@
 import pygame
 import pygame.draw
 import model
-import color
-from view import w, h, FPS, screen
+from constants import w, h, FPS
 import view
 import ui
 
@@ -26,16 +25,14 @@ while not finished:
                 model.add_particle(ui.type_for_click, mouse[0], mouse[1])
             if mouse[0] >= w and mouse[1] <= h / 5:
                 model.new_world()
+
     for i in range(ui.SIMULATIONS_PER_FRAME):
         model.mmmodel()
-    pygame.draw.rect(screen, color.DARK_BACKGROUND, (0, 0, w, h))
-    for i in range(model.fw):
-        for j in range(model.fh):
-            for a in model.fields[i][j]:
-                pygame.draw.circle(screen, a.color, (a.x, a.y), model.NODE_RADIUS)
+    view.draw_background()
+    view.draw_particles(model.fields)
     if ui.DRAW_CONNECTIONS:
-        for l in model.links:
-            view.draw_link(l, model.NODE_RADIUS)
+        view.draw_links(model.links)
+
     ui.draw_button(mouse)
     pygame.display.update()
 pygame.quit()

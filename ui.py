@@ -1,8 +1,10 @@
 import pygame.draw
 import pygame
 import sys
-from view import w, h, screen
+from constants import w, h
 
+
+screen = pygame.display.set_mode((w + 150, h))  # TODO: допокно для кнопок и регуляторов, нужно его улучшить и сделать красивым
 
 NUMBER_OF_TYPES = 3  # TODO: добавить контроллер-scrollbar
 NODE_COUNT = 250  # TODO: добавить контроллер-scrollbar
@@ -13,6 +15,7 @@ type_for_click = 0  # TODO: заготовочка под выбор типа ч
 
 color_light = (250, 250, 250)
 color_dark = (170, 170, 170)
+text = ''
 
 
 def create_button():
