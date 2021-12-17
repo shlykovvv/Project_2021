@@ -1,12 +1,12 @@
 import random
 import math
 from ui import NUMBER_OF_TYPES, NODE_COUNT
-from constants import COLORS, w, h, NODE_RADIUS, LINK_FORCE, SPEED, MAX_DIST, BORDER
+from constants import COLORS, WIDTH, HEIGHT, NODE_RADIUS, LINK_FORCE, SPEED, MAX_DIST, BORDER
 
 
 MAX_DIST2 = MAX_DIST * MAX_DIST
-fw = w // MAX_DIST + 1
-fh = h // MAX_DIST + 1
+deltaW = WIDTH // MAX_DIST + 1
+deltaH = HEIGHT // MAX_DIST + 1
 
 
 class Link:
@@ -28,7 +28,7 @@ class Particle:
 
 
 LINKS, LINKS_POSSIBLE, COUPLING = [], [], []
-fields, links = [], []
+links, fields = [], []
 
 
 def generate_rules():
@@ -52,18 +52,18 @@ def add_particle(type, x, y):
     return p
 
 
-def new_world():
+def create_new_world():
     generate_rules()
     global fields, links
-    fields = [0] * fw  # array for dividing scene into parts to reduce complexity
-    for i in range(fw):
-        fields[i] = [0] * fh
-        for j in range(fh):
+    fields = [0] * deltaW  # array for dividing scene into parts to reduce complexity
+    for i in range(deltaW):
+        fields[i] = [0] * deltaH
+        for j in range(deltaH):
             fields[i][j] = []
     links = []
     for i in range(NODE_COUNT):  # put particles randomly
-        add_particle(random.randint(0, NUMBER_OF_TYPES - 1), random.random() * (w - 2 * NODE_RADIUS) + NUMBER_OF_TYPES,
-                     random.random() * (h - 2 * NODE_RADIUS) + NUMBER_OF_TYPES)
+        add_particle(random.randint(0, NUMBER_OF_TYPES - 1), random.random() * (WIDTH - 2 * NODE_RADIUS) +
+                     NUMBER_OF_TYPES, random.random() * (HEIGHT - 2 * NODE_RADIUS) + NUMBER_OF_TYPES)
 
 
 def applyForce(a, b):
@@ -106,8 +106,8 @@ def applyForce(a, b):
 
 
 def mmmodel():
-    for i in range(fw):
-        for j in range(fh):
+    for i in range(deltaW):
+        for j in range(deltaH):
             for a in fields[i][j]:
                 a.x += a.sx
                 a.y += a.sy
@@ -126,20 +126,20 @@ def mmmodel():
                     if a.x < 0:
                         a.x = -a.x
                         a.sx *= -0.5
-                elif a.x > w - BORDER:
+                elif a.x > WIDTH - BORDER:
                     a.sx -= SPEED * 0.05
-                    if a.x > w:
-                        a.x = w * 2 - a.x
+                    if a.x > WIDTH:
+                        a.x = WIDTH * 2 - a.x
                         a.sx *= -0.5
                 if a.y < BORDER:
                     a.sy += SPEED * 0.05
                     if a.y < 0:
                         a.y = -a.y
                         a.sy *= -0.5
-                elif a.y > h - BORDER:
+                elif a.y > HEIGHT - BORDER:
                     a.sy -= SPEED * 0.05
-                    if a.y > h:
-                        a.y = h * 2 - a.y
+                    if a.y > HEIGHT:
+                        a.y = HEIGHT * 2 - a.y
                         a.sy *= -0.5
     for link in links:
         a = link.a
@@ -160,40 +160,40 @@ def mmmodel():
             b.sy -= math.sin(angle) * LINK_FORCE * SPEED
 
     # moving particle to another field
-    for i in range(fw):
-        for j in range(fh):
+    for i in range(deltaW):
+        for j in range(deltaH):
             for a in fields[i][j]:
                 if (round(a.x / MAX_DIST) != i) or (round(a.y / MAX_DIST) != j):
                     fields[i][j].remove(a)
                     fields[round(a.x / MAX_DIST)][round(a.y / MAX_DIST)].append(a)
 
     # dividing scene into parts to reduce complexity
-    for i in range(fw):
-        for j in range(fh):
+    for i in range(deltaW):
+        for j in range(deltaH):
             for a in fields[i][j]:
                 particleToLink = 0
-                particleToLinkMinDist2 = (w + h) * (w + h)
+                particleToLinkMinDist2 = (WIDTH + HEIGHT) * (WIDTH + HEIGHT)
                 for b in fields[i][j]:
                     if b != a:
                         d2 = applyForce(a, b)
                         if d2 != -1 and d2 < particleToLinkMinDist2:
                             particleToLinkMinDist2 = d2
                             particleToLink = b
-                if i < fw - 1:
+                if i < deltaW - 1:
                     iNext = i + 1
                     for b in fields[iNext][j]:
                         d2 = applyForce(a, b)
                         if d2 != -1 and d2 < particleToLinkMinDist2:
                             particleToLinkMinDist2 = d2
                             particleToLink = b
-                if j < fh - 1:
+                if j < deltaH - 1:
                     jNext = j + 1
                     for b in fields[i][jNext]:
                         d2 = applyForce(a, b)
                         if d2 != -1 and d2 < particleToLinkMinDist2:
                             particleToLinkMinDist2 = d2
                             particleToLink = b
-                    if i < fw - 1:
+                    if i < deltaW - 1:
                         iNext = i + 1
                         for b in fields[iNext][jNext]:
                             d2 = applyForce(a, b)

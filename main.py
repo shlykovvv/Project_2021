@@ -1,12 +1,12 @@
 import pygame
 import pygame.draw
 import model
-from constants import w, h, FPS
+from constants import WIDTH, HEIGHT, FPS
 import view
 import ui
 
 
-model.new_world()
+model.create_new_world()
 
 pygame.init()
 pygame.display.update()
@@ -21,10 +21,10 @@ while not finished:
         if event.type == pygame.QUIT:
             finished = True
         if event.type == pygame.MOUSEBUTTONDOWN:
-            if mouse[0] <= w and mouse[1] <= h:
+            if mouse[0] <= WIDTH and mouse[1] <= HEIGHT:
                 model.add_particle(ui.type_for_click, mouse[0], mouse[1])
-            if mouse[0] >= w and mouse[1] <= h / 5:
-                model.new_world()
+            if mouse[0] >= WIDTH and mouse[1] <= HEIGHT / 5:
+                model.create_new_world()
 
     for i in range(ui.SIMULATIONS_PER_FRAME):
         model.mmmodel()

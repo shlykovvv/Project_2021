@@ -1,18 +1,18 @@
 import pygame
 import math
-from constants import w, h, NODE_RADIUS, BACKGROUND_COLOR
+from constants import WIDTH, HEIGHT, NODE_RADIUS, BACKGROUND_COLOR
 import ui
-from model import fw, fh
+from model import deltaW, deltaH
 
 
 def draw_background():
-    pygame.draw.rect(ui.screen, BACKGROUND_COLOR, (0, 0, w, h))
-    pygame.draw.rect(ui.screen, 'black', (w, 0, w + 150, h))
+    pygame.draw.rect(ui.screen, BACKGROUND_COLOR, (0, 0, WIDTH, HEIGHT))
+    pygame.draw.rect(ui.screen, 'black', (WIDTH, 0, WIDTH + 150, HEIGHT))
 
 
 def draw_particles(fields):
-    for i in range(fw):
-        for j in range(fh):
+    for i in range(deltaW):
+        for j in range(deltaH):
             for a in fields[i][j]:
                 pygame.draw.circle(ui.screen, a.color, (a.x, a.y), NODE_RADIUS)
 

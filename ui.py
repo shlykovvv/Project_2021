@@ -1,10 +1,10 @@
 import pygame.draw
 import pygame
 import sys
-from constants import w, h
+from constants import WIDTH, HEIGHT
 
 
-screen = pygame.display.set_mode((w + 150, h))  # TODO: допокно для кнопок и регуляторов, нужно его улучшить и сделать красивым
+screen = pygame.display.set_mode((WIDTH + 150, HEIGHT))  # TODO: допокно для кнопок и регуляторов, нужно его улучшить и сделать красивым
 
 NUMBER_OF_TYPES = 3  # TODO: добавить контроллер-scrollbar
 NODE_COUNT = 250  # TODO: добавить контроллер-scrollbar
@@ -20,13 +20,13 @@ text = ''
 
 def create_button():
     global text
-    smallfont = pygame.font.SysFont('Corbel', int(w / 40))
+    smallfont = pygame.font.SysFont('Corbel', int(WIDTH / 40))
     text = smallfont.render('Create new world', True, (0, 0, 0))  # TODO: сделать кнопку красивой
 
 
 def draw_button(mouse):
-    if mouse[0] >= w and mouse[1] <= h / 5:
-        pygame.draw.rect(screen, color_light, [w, 0, w + 150, h / 5])
+    if mouse[0] >= WIDTH and mouse[1] <= HEIGHT / 5:
+        pygame.draw.rect(screen, color_light, [WIDTH, 0, WIDTH + 150, HEIGHT / 5])
     else:
-        pygame.draw.rect(screen, color_dark, [w, 0, w + 150, h / 5])
-    screen.blit(text, (w + 20, h / 10 - 5))
+        pygame.draw.rect(screen, color_dark, [WIDTH, 0, WIDTH + 150, HEIGHT / 5])
+    screen.blit(text, (WIDTH + 20, HEIGHT / 10 - 5))
