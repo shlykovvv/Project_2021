@@ -5,15 +5,14 @@ from view import w, h
 import color
 
 
-
-NODE_RADIUS = 5
+NODE_RADIUS = 5  # TODO: в теории можно добавить регулятор
+LINK_FORCE = -0.015  # TODO: в теории можно добавить регулятор
+SPEED = 4  # TODO: в теории можно добавить регулятор
 MAX_DIST = 100
 MAX_DIST2 = MAX_DIST * MAX_DIST
-SPEED = 4
 BORDER = 30
 fw = w // MAX_DIST + 1
 fh = h // MAX_DIST + 1
-LINK_FORCE = -0.015
 
 
 class Link:
@@ -34,11 +33,9 @@ class Particle:
         self.color = color.COLORS[self.type]
 
 
-def generateRules():
+def generate_rules():
     global LINKS, LINKS_POSSIBLE, COUPLING
-    LINKS = []
-    LINKS_POSSIBLE = []
-    COUPLING = []
+    LINKS, LINKS_POSSIBLE, COUPLING = [], [], []
     for i in range(NUMBER_OF_TYPES):
         LINKS.append(math.floor(random.random() * 4))
         COUPLING.append([])
@@ -51,14 +48,14 @@ def generateRules():
     print(COUPLING)
 
 
-def add(type, x, y):
+def add_particle(type, x, y):
     p = Particle(type, x, y)
     fields[round(p.x / MAX_DIST)][round(p.y / MAX_DIST)].append(p)
     return p
 
 
 def new_world():
-    generateRules()
+    generate_rules()
     global fields, links
     fields = [0] * fw  # array for dividing scene into parts to reduce complexity
     for i in range(fw):
@@ -67,8 +64,8 @@ def new_world():
             fields[i][j] = []
     links = []
     for i in range(NODE_COUNT):  # put particles randomly
-        add(random.randint(0, NUMBER_OF_TYPES - 1), random.random() * (w - 2 * NODE_RADIUS) + NUMBER_OF_TYPES,
-            random.random() * (h - 2 * NODE_RADIUS) + NUMBER_OF_TYPES)
+        add_particle(random.randint(0, NUMBER_OF_TYPES - 1), random.random() * (w - 2 * NODE_RADIUS) + NUMBER_OF_TYPES,
+                     random.random() * (h - 2 * NODE_RADIUS) + NUMBER_OF_TYPES)
 
 
 def applyForce(a, b):

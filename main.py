@@ -22,6 +22,8 @@ while not finished:
         if event.type == pygame.QUIT:
             finished = True
         if event.type == pygame.MOUSEBUTTONDOWN:
+            if mouse[0] <= w and mouse[1] <= h:
+                model.add_particle(ui.type_for_click, mouse[0], mouse[1])
             if mouse[0] >= w and mouse[1] <= h / 5:
                 model.new_world()
     for i in range(ui.SIMULATIONS_PER_FRAME):

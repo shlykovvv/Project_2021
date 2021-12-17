@@ -9,6 +9,7 @@ NODE_COUNT = 250  # TODO: добавить контроллер-scrollbar
 SIMULATIONS_PER_FRAME = 2  # TODO: добавить контроллер-scrollbar
 
 DRAW_CONNECTIONS = True  # TODO: добавить галочку
+type_for_click = 0  # TODO: заготовочка под выбор типа частицы для создания по клику
 
 color_light = (250, 250, 250)
 color_dark = (170, 170, 170)
