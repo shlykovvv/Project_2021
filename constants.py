@@ -11,8 +11,8 @@ WHITE = (200, 200, 200)
 COLORS = [RED, BROWN, BLUE_SEA, BLUE, PURPLE, GREEN, GREY, PINK, WHITE]
 
 FPS = 600
-WIDTH = 600
-HEIGHT = 400
+WIDTH = 700
+HEIGHT = 500
 
 NODE_RADIUS = 5  # TODO: в теории можно добавить регулятор
 LINK_FORCE = -0.015  # TODO: в теории можно добавить регулятор

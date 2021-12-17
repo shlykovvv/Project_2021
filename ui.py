@@ -6,8 +6,8 @@ from constants import WIDTH, HEIGHT
 
 screen = pygame.display.set_mode((WIDTH + 150, HEIGHT))  # TODO: допокно для кнопок и регуляторов, нужно его улучшить и сделать красивым
 
-NUMBER_OF_TYPES = 3  # TODO: добавить контроллер-scrollbar
-NODE_COUNT = 250  # TODO: добавить контроллер-scrollbar
+NUMBER_OF_TYPES = 4  # TODO: добавить контроллер-scrollbar
+NODE_COUNT = 300  # TODO: добавить контроллер-scrollbar
 SIMULATIONS_PER_FRAME = 2  # TODO: добавить контроллер-scrollbar
 
 DRAW_CONNECTIONS = True  # TODO: добавить галочку
