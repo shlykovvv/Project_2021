@@ -1,5 +1,6 @@
 import pygame.draw
 import pygame
+import math
 import sys
 from constants import WIDTH, HEIGHT
 
@@ -9,7 +10,11 @@ NUMBER_OF_TYPES = 3
 NODE_COUNT = 250
 SIMULATIONS_PER_FRAME = 2
 
-DRAW_CONNECTIONS = True
+NODE_RADIUS = 5  # TODO: моё мнение, что при нехватки времени контроллеры этих параметров можно и убрать, положив переменные обратно к константам
+LINK_FORCE = - 0.015  # TODO: моё мнение, что при нехватки времени контроллеры этих параметров можно и убрать, положив переменные обратно к конста
+SPEED = 4  # TODO: моё мнение, что при нехватки времени контроллеры этих параметров можно и убрать, положив переменные обратно к конста
+
+# DRAW_CONNECTIONS = True
 type_for_click = 0
 
 color_light = (170, 170, 170)
@@ -33,11 +38,15 @@ def draw_buttons(mouse):
 
 
 def controllers_info(mouse):
+    global NODE_COUNT
     x, y = mouse[0], mouse[1]
     for s in controllers:
         if s != 'connections' and s != 'brush':
             if controllers[s]['y'] - 3 <= y <= controllers[s]['y'] + 9:
                 controllers[s]['x'] = x - 4
+                if s == 'count':
+                    NODE_COUNT = math.floor((controllers[s]['x'] - 26) / 190 * 600)
+                    print('ddd')
         if s == 'connections':
             if 30 <= x <= 50 and 230 <= y <= 250:
                 if controllers[s]:

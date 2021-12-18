@@ -1,7 +1,7 @@
 import random
 import math
-from ui import NUMBER_OF_TYPES, NODE_COUNT
-from constants import COLORS, WIDTH, HEIGHT, NODE_RADIUS, LINK_FORCE, SPEED, MAX_DIST, BORDER
+import ui
+from constants import COLORS, WIDTH, HEIGHT, MAX_DIST, BORDER
 
 MAX_DIST2 = MAX_DIST * MAX_DIST
 deltaW = WIDTH // MAX_DIST + 1
@@ -40,22 +40,22 @@ class Particle:
 
         # border repulsion
         if self.x < BORDER:
-            self.vx += SPEED * 0.05
+            self.vx += ui.SPEED * 0.05
             if self.x < 0:
                 self.x = -self.x
                 self.vx *= -0.5
         elif self.x > WIDTH - BORDER:
-            self.vx -= SPEED * 0.05
+            self.vx -= ui.SPEED * 0.05
             if self.x > WIDTH:
                 self.x = WIDTH * 2 - self.x
                 self.vx *= -0.5
         if self.y < BORDER:
-            self.vy += SPEED * 0.05
+            self.vy += ui.SPEED * 0.05
             if self.y < 0:
                 self.y = -self.y
                 self.vy *= -0.5
         elif self.y > HEIGHT - BORDER:
-            self.vy -= SPEED * 0.05
+            self.vy -= ui.SPEED * 0.05
             if self.y > HEIGHT:
                 self.y = HEIGHT * 2 - self.y
                 self.vy *= -0.5
@@ -68,11 +68,11 @@ links, fields = [], []
 def generate_rules():
     global LINKS, LINKS_POSSIBLE, COUPLING
     LINKS, LINKS_POSSIBLE, COUPLING = [], [], []
-    for i in range(NUMBER_OF_TYPES):
+    for i in range(ui.NUMBER_OF_TYPES):
         LINKS.append(math.floor(random.random() * 4))
         COUPLING.append([])
         LINKS_POSSIBLE.append([])
-        for j in range(NUMBER_OF_TYPES):
+        for j in range(ui.NUMBER_OF_TYPES):
             LINKS_POSSIBLE[i].append(math.floor(random.random() * 4))
             COUPLING[i].append(math.floor(random.random() * 3 - 1))
     print(LINKS)
@@ -89,9 +89,9 @@ def create_new_world():
         for j in range(deltaH):
             fields[i][j] = []
     links = []
-    for i in range(NODE_COUNT):  # put particles randomly
-        Particle(random.randint(0, NUMBER_OF_TYPES - 1), random.random() * (WIDTH - 2 * NODE_RADIUS) + NUMBER_OF_TYPES,
-                 random.random() * (HEIGHT - 2 * NODE_RADIUS) + NUMBER_OF_TYPES)
+    for i in range(ui.NODE_COUNT):  # put particles randomly
+        Particle(random.randint(0, ui.NUMBER_OF_TYPES - 1), random.random() * (WIDTH - 2 * ui.NODE_RADIUS) +
+                 ui.NUMBER_OF_TYPES, random.random() * (HEIGHT - 2 * ui.NODE_RADIUS) + ui.NUMBER_OF_TYPES)
 
 
 def check_canlink(a: Particle, b: Particle, distance2):
@@ -123,16 +123,16 @@ def calc_interactions(a: Particle, b: Particle, distance2):
             if b not in a.bonds and a not in b.bonds:
                 a_force = 1 / distance2
                 b_force = 1 / distance2
-        if distance2 < NODE_RADIUS * NODE_RADIUS * 4:
+        if distance2 < ui.NODE_RADIUS * ui.NODE_RADIUS * 4:
             if distance2 < 1:
                 distance2 = 1
             a_force = 1 / distance2
             b_force = 1 / distance2
         angle = math.atan2(a.y - b.y, a.x - b.x)
-        a.vx += math.cos(angle) * a_force * SPEED
-        a.vy += math.sin(angle) * a_force * SPEED
-        b.vx -= math.cos(angle) * b_force * SPEED
-        b.vy -= math.sin(angle) * b_force * SPEED
+        a.vx += math.cos(angle) * a_force * ui.SPEED
+        a.vy += math.sin(angle) * a_force * ui.SPEED
+        b.vx -= math.cos(angle) * b_force * ui.SPEED
+        b.vy -= math.sin(angle) * b_force * ui.SPEED
 
 
 def mmmodel():
@@ -151,12 +151,12 @@ def mmmodel():
             b.bonds.remove(a)
             links.remove(link)
             i -= 1
-        elif d2 > NODE_RADIUS * NODE_RADIUS * 4:
+        elif d2 > ui.NODE_RADIUS * ui.NODE_RADIUS * 4:
             angle = math.atan2(a.y - b.y, a.x - b.x)
-            a.vx += math.cos(angle) * LINK_FORCE * SPEED
-            a.vy += math.sin(angle) * LINK_FORCE * SPEED
-            b.vx -= math.cos(angle) * LINK_FORCE * SPEED
-            b.vy -= math.sin(angle) * LINK_FORCE * SPEED
+            a.vx += math.cos(angle) * ui.LINK_FORCE * ui.SPEED
+            a.vy += math.sin(angle) * ui.LINK_FORCE * ui.SPEED
+            b.vx -= math.cos(angle) * ui.LINK_FORCE * ui.SPEED
+            b.vy -= math.sin(angle) * ui.LINK_FORCE * ui.SPEED
 
     # moving particle to another field
     for i in range(deltaW):
