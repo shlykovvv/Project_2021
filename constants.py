@@ -10,12 +10,12 @@ PINK = (250, 150, 210)
 WHITE = (200, 200, 200)
 COLORS = [RED, BROWN, BLUE_SEA, BLUE, PURPLE, GREEN, GREY, PINK, WHITE]
 
-FPS = 600
-WIDTH = 700
+FPS = 500
+WIDTH = 800
 HEIGHT = 500
 
-NODE_RADIUS = 5  # TODO: в теории можно добавить регулятор
-LINK_FORCE = -0.015  # TODO: в теории можно добавить регулятор
-SPEED = 4  # TODO: в теории можно добавить регулятор
+NODE_RADIUS = 5
+LINK_FORCE = - 0.015
+SPEED = 4
 MAX_DIST = 100
 BORDER = 30
