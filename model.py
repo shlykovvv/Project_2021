@@ -60,26 +60,34 @@ def create_new_world():
                  random.random() * (HEIGHT - 2 * NODE_RADIUS) + NUMBER_OF_TYPES)
 
 
-def applyForce(a, b):
+def check_canlink(a, b):
     distance2 = (a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y)
     canlink = False
+    if distance2 < MAX_DIST2 / 4:
+        if a.links_number < LINKS[a.type] and b.links_number < LINKS[b.type]:
+            if b not in a.bonds and a not in b.bonds:
+                type_count_a = 0
+                for p in a.bonds:
+                    if p.type == b.type:
+                        type_count_a += 1
+                type_count_b = 0
+                for p in b.bonds:
+                    if p.type == a.type:
+                        type_count_b += 1
+                if type_count_a < LINKS_POSSIBLE[a.type][b.type] and type_count_b < LINKS_POSSIBLE[b.type][a.type]:
+                    canlink = True
+    if canlink:
+        return distance2
+    else:
+        return -1
+
+
+def applyForce(a, b):
+    distance2 = (a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y)
     if distance2 < MAX_DIST2:
         a_force = COUPLING[a.type][b.type] / distance2
         b_force = COUPLING[b.type][a.type] / distance2
-        if a.links_number < LINKS[a.type] and b.links_number < LINKS[b.type]:
-            if distance2 < MAX_DIST2 / 4:
-                if b not in a.bonds and a not in b.bonds:
-                    type_count_a = 0
-                    for p in a.bonds:
-                        if p.type == b.type:
-                            type_count_a += 1
-                    type_count_b = 0
-                    for p in b.bonds:
-                        if p.type == a.type:
-                            type_count_b += 1
-                    if type_count_a < LINKS_POSSIBLE[a.type][b.type] and type_count_b < LINKS_POSSIBLE[b.type][a.type]:
-                        canlink = True
-        else:
+        if a.links_number >= LINKS[a.type] or b.links_number >= LINKS[b.type]:
             if b not in a.bonds and a not in b.bonds:
                 a_force = 1 / distance2
                 b_force = 1 / distance2
@@ -93,10 +101,6 @@ def applyForce(a, b):
         a.vy += math.sin(angle) * a_force * SPEED
         b.vx -= math.cos(angle) * b_force * SPEED
         b.vy -= math.sin(angle) * b_force * SPEED
-    if canlink:
-        return distance2
-    else:
-        return -1
 
 
 def mmmodel():
@@ -169,28 +173,32 @@ def mmmodel():
                 particleToLinkMinDist2 = (WIDTH + HEIGHT) * (WIDTH + HEIGHT)
                 for b in fields[i][j]:
                     if b != a:
-                        d2 = applyForce(a, b)
+                        applyForce(a, b)
+                        d2 = check_canlink(a, b)
                         if d2 != -1 and d2 < particleToLinkMinDist2:
                             particleToLinkMinDist2 = d2
                             particleToLink = b
                 if i < deltaW - 1:
                     iNext = i + 1
                     for b in fields[iNext][j]:
-                        d2 = applyForce(a, b)
+                        d2 = check_canlink(a, b)
+                        applyForce(a, b)
                         if d2 != -1 and d2 < particleToLinkMinDist2:
                             particleToLinkMinDist2 = d2
                             particleToLink = b
                 if j < deltaH - 1:
                     jNext = j + 1
                     for b in fields[i][jNext]:
-                        d2 = applyForce(a, b)
+                        d2 = check_canlink(a, b)
+                        applyForce(a, b)
                         if d2 != -1 and d2 < particleToLinkMinDist2:
                             particleToLinkMinDist2 = d2
                             particleToLink = b
                     if i < deltaW - 1:
                         iNext = i + 1
                         for b in fields[iNext][jNext]:
-                            d2 = applyForce(a, b)
+                            d2 = check_canlink(a, b)
+                            applyForce(a, b)
                             if d2 != -1 and d2 < particleToLinkMinDist2:
                                 particleToLinkMinDist2 = d2
                                 particleToLink = b
