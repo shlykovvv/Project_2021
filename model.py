@@ -135,47 +135,11 @@ def calc_interactions(a: Particle, b: Particle, distance2):
         b.vy -= math.sin(angle) * b_force * SPEED
 
 
-def mmmove(a):
-    a.x += a.vx
-    a.y += a.vy
-    a.vx *= 0.98
-    a.vy *= 0.98
-    # velocity normalization
-    # idk if it is still necessary
-    magnitude = math.sqrt(a.vx * a.vx + a.vy * a.vy)
-    if magnitude > 1:
-        a.vx /= magnitude
-        a.vy /= magnitude
-
-    # border repulsion
-    if a.x < BORDER:
-        a.vx += SPEED * 0.05
-        if a.x < 0:
-            a.x = -a.x
-            a.vx *= -0.5
-    elif a.x > WIDTH - BORDER:
-        a.vx -= SPEED * 0.05
-        if a.x > WIDTH:
-            a.x = WIDTH * 2 - a.x
-            a.vx *= -0.5
-    if a.y < BORDER:
-        a.vy += SPEED * 0.05
-        if a.y < 0:
-            a.y = -a.y
-            a.vy *= -0.5
-    elif a.y > HEIGHT - BORDER:
-        a.vy -= SPEED * 0.05
-        if a.y > HEIGHT:
-            a.y = HEIGHT * 2 - a.y
-            a.vy *= -0.5
-
-
 def mmmodel():
     for i in range(deltaW):
         for j in range(deltaH):
             for a in fields[i][j]:
-                mmmove(a)
-                # a.move
+                a.move()
     for link in links:
         a = link.a
         b = link.b

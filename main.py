@@ -21,7 +21,7 @@ while not finished:
             finished = True
         if event.type == pygame.MOUSEBUTTONDOWN:
             if mouse[0] <= WIDTH and mouse[1] <= HEIGHT:
-                model.add_particle(ui.type_for_click, mouse[0], mouse[1])
+                model.Particle(ui.type_for_click, mouse[0], mouse[1])
             if 30 <= mouse[0] <= 250:
                 ui.controllers_info(mouse)
                 if 40 <= mouse[1] <= 80 and opened:
