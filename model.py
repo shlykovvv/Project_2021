@@ -26,6 +26,40 @@ class Particle:
         self.color = COLORS[self.type]
         fields[round(self.x / MAX_DIST)][round(self.y / MAX_DIST)].append(self)
 
+    def move(self):
+        self.x += self.vx
+        self.y += self.vy
+        self.vx *= 0.98
+        self.vy *= 0.98
+        # velocity normalization
+        # idk if it is still necessary
+        magnitude = math.sqrt(self.vx * self.vx + self.vy * self.vy)
+        if magnitude > 1:
+            self.vx /= magnitude
+            self.vy /= magnitude
+
+        # border repulsion
+        if self.x < BORDER:
+            self.vx += SPEED * 0.05
+            if self.x < 0:
+                self.x = -self.x
+                self.vx *= -0.5
+        elif self.x > WIDTH - BORDER:
+            self.vx -= SPEED * 0.05
+            if self.x > WIDTH:
+                self.x = WIDTH * 2 - self.x
+                self.vx *= -0.5
+        if self.y < BORDER:
+            self.vy += SPEED * 0.05
+            if self.y < 0:
+                self.y = -self.y
+                self.vy *= -0.5
+        elif self.y > HEIGHT - BORDER:
+            self.vy -= SPEED * 0.05
+            if self.y > HEIGHT:
+                self.y = HEIGHT * 2 - self.y
+                self.vy *= -0.5
+
 
 LINKS, LINKS_POSSIBLE, COUPLING = [], [], []
 links, fields = [], []
@@ -60,8 +94,7 @@ def create_new_world():
                  random.random() * (HEIGHT - 2 * NODE_RADIUS) + NUMBER_OF_TYPES)
 
 
-def check_canlink(a, b):
-    distance2 = (a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y)
+def check_canlink(a: Particle, b: Particle, distance2):
     canlink = False
     if distance2 < MAX_DIST2 / 4:
         if a.links_number < LINKS[a.type] and b.links_number < LINKS[b.type]:
@@ -82,8 +115,7 @@ def check_canlink(a, b):
         return -1
 
 
-def applyForce(a, b):
-    distance2 = (a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y)
+def calc_interactions(a: Particle, b: Particle, distance2):
     if distance2 < MAX_DIST2:
         a_force = COUPLING[a.type][b.type] / distance2
         b_force = COUPLING[b.type][a.type] / distance2
@@ -91,54 +123,59 @@ def applyForce(a, b):
             if b not in a.bonds and a not in b.bonds:
                 a_force = 1 / distance2
                 b_force = 1 / distance2
-        angle = math.atan2(a.y - b.y, a.x - b.x)
         if distance2 < NODE_RADIUS * NODE_RADIUS * 4:
             if distance2 < 1:
                 distance2 = 1
             a_force = 1 / distance2
             b_force = 1 / distance2
+        angle = math.atan2(a.y - b.y, a.x - b.x)
         a.vx += math.cos(angle) * a_force * SPEED
         a.vy += math.sin(angle) * a_force * SPEED
         b.vx -= math.cos(angle) * b_force * SPEED
         b.vy -= math.sin(angle) * b_force * SPEED
 
 
+def mmmove(a):
+    a.x += a.vx
+    a.y += a.vy
+    a.vx *= 0.98
+    a.vy *= 0.98
+    # velocity normalization
+    # idk if it is still necessary
+    magnitude = math.sqrt(a.vx * a.vx + a.vy * a.vy)
+    if magnitude > 1:
+        a.vx /= magnitude
+        a.vy /= magnitude
+
+    # border repulsion
+    if a.x < BORDER:
+        a.vx += SPEED * 0.05
+        if a.x < 0:
+            a.x = -a.x
+            a.vx *= -0.5
+    elif a.x > WIDTH - BORDER:
+        a.vx -= SPEED * 0.05
+        if a.x > WIDTH:
+            a.x = WIDTH * 2 - a.x
+            a.vx *= -0.5
+    if a.y < BORDER:
+        a.vy += SPEED * 0.05
+        if a.y < 0:
+            a.y = -a.y
+            a.vy *= -0.5
+    elif a.y > HEIGHT - BORDER:
+        a.vy -= SPEED * 0.05
+        if a.y > HEIGHT:
+            a.y = HEIGHT * 2 - a.y
+            a.vy *= -0.5
+
+
 def mmmodel():
     for i in range(deltaW):
         for j in range(deltaH):
             for a in fields[i][j]:
-                a.x += a.vx
-                a.y += a.vy
-                a.vx *= 0.98
-                a.vy *= 0.98
-                # velocity normalization
-                # idk if it is still necessary
-                magnitude = math.sqrt(a.vx * a.vx + a.vy * a.vy)
-                if magnitude > 1:
-                    a.vx /= magnitude
-                    a.vy /= magnitude
-
-                # border repulsion
-                if a.x < BORDER:
-                    a.vx += SPEED * 0.05
-                    if a.x < 0:
-                        a.x = -a.x
-                        a.vx *= -0.5
-                elif a.x > WIDTH - BORDER:
-                    a.vx -= SPEED * 0.05
-                    if a.x > WIDTH:
-                        a.x = WIDTH * 2 - a.x
-                        a.vx *= -0.5
-                if a.y < BORDER:
-                    a.vy += SPEED * 0.05
-                    if a.y < 0:
-                        a.y = -a.y
-                        a.vy *= -0.5
-                elif a.y > HEIGHT - BORDER:
-                    a.vy -= SPEED * 0.05
-                    if a.y > HEIGHT:
-                        a.y = HEIGHT * 2 - a.y
-                        a.vy *= -0.5
+                mmmove(a)
+                # a.move
     for link in links:
         a = link.a
         b = link.b
@@ -173,32 +210,36 @@ def mmmodel():
                 particleToLinkMinDist2 = (WIDTH + HEIGHT) * (WIDTH + HEIGHT)
                 for b in fields[i][j]:
                     if b != a:
-                        applyForce(a, b)
-                        d2 = check_canlink(a, b)
+                        distance2 = (a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y)
+                        calc_interactions(a, b, distance2)
+                        d2 = check_canlink(a, b, distance2)
                         if d2 != -1 and d2 < particleToLinkMinDist2:
                             particleToLinkMinDist2 = d2
                             particleToLink = b
                 if i < deltaW - 1:
                     iNext = i + 1
                     for b in fields[iNext][j]:
-                        d2 = check_canlink(a, b)
-                        applyForce(a, b)
+                        distance2 = (a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y)
+                        calc_interactions(a, b, distance2)
+                        d2 = check_canlink(a, b, distance2)
                         if d2 != -1 and d2 < particleToLinkMinDist2:
                             particleToLinkMinDist2 = d2
                             particleToLink = b
                 if j < deltaH - 1:
                     jNext = j + 1
                     for b in fields[i][jNext]:
-                        d2 = check_canlink(a, b)
-                        applyForce(a, b)
+                        distance2 = (a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y)
+                        calc_interactions(a, b, distance2)
+                        d2 = check_canlink(a, b, distance2)
                         if d2 != -1 and d2 < particleToLinkMinDist2:
                             particleToLinkMinDist2 = d2
                             particleToLink = b
                     if i < deltaW - 1:
                         iNext = i + 1
                         for b in fields[iNext][jNext]:
-                            d2 = check_canlink(a, b)
-                            applyForce(a, b)
+                            distance2 = (a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y)
+                            calc_interactions(a, b, distance2)
+                            d2 = check_canlink(a, b, distance2)
                             if d2 != -1 and d2 < particleToLinkMinDist2:
                                 particleToLinkMinDist2 = d2
                                 particleToLink = b
