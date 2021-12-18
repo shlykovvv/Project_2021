@@ -26,7 +26,7 @@ while not finished:
                 ui.controllers_info(mouse)
                 if 40 <= mouse[1] <= 80 and opened:
                     opened = False
-                if 347 <= mouse[1] <= 387:
+                if 347 <= mouse[1] <= 387 and opened:
                     model.create_new_world()
             if 20 <= mouse[0] <= 40 and 20 <= mouse[1] <= 40 and not opened:
                 opened = True
@@ -34,7 +34,7 @@ while not finished:
     for i in range(ui.SIMULATIONS_PER_FRAME):
         model.mmmodel()
     view.draw_particles(model.fields)
-    if ui.DRAW_CONNECTIONS:
+    if ui.controllers['connections']:
         view.draw_links(model.links)
     if opened:
         view.draw_settings()

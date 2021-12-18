@@ -35,7 +35,7 @@ def draw_buttons(mouse):
 def controllers_info(mouse):
     x, y = mouse[0], mouse[1]
     for s in controllers:
-        if not (s == 'connections' or s == 'brush'):
+        if s != 'connections' and s != 'brush':
             if controllers[s]['y'] - 3 <= y <= controllers[s]['y'] + 9:
                 controllers[s]['x'] = x - 4
         if s == 'connections':
@@ -50,7 +50,7 @@ def controllers_info(mouse):
 
 def draw_controllers():
     for s in controllers:
-        if not (s == 'connections' or s == 'brush'):
+        if s != 'connections' and s != 'brush':
             pygame.draw.rect(screen, (150, 150, 150), [30, controllers[s]['y'], 220, 6])
             pygame.draw.rect(screen, (100, 100, 100), [controllers[s]['x'], controllers[s]['y'] - 3, 8, 12])
         if s == 'connections':
