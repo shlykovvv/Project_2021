@@ -3,7 +3,6 @@ import math
 from ui import NUMBER_OF_TYPES, NODE_COUNT
 from constants import COLORS, WIDTH, HEIGHT, NODE_RADIUS, LINK_FORCE, SPEED, MAX_DIST, BORDER
 
-
 MAX_DIST2 = MAX_DIST * MAX_DIST
 deltaW = WIDTH // MAX_DIST + 1
 deltaH = HEIGHT // MAX_DIST + 1
@@ -20,9 +19,9 @@ class Particle:
         self.type = type
         self.x = x
         self.y = y
-        self.sx = 0
-        self.sy = 0
-        self.links = 0
+        self.vx = 0
+        self.vy = 0
+        self.links_number = 0
         self.bonds = []
         self.color = COLORS[self.type]
         fields[round(self.x / MAX_DIST)][round(self.y / MAX_DIST)].append(self)
@@ -47,12 +46,6 @@ def generate_rules():
     print(COUPLING)
 
 
-# def add_particle(type, x, y):
-#     p = Particle(type, x, y)
-#     fields[round(p.x / MAX_DIST)][round(p.y / MAX_DIST)].append(p)
-#     return p
-
-
 def create_new_world():
     generate_rules()
     global fields, links
@@ -63,45 +56,45 @@ def create_new_world():
             fields[i][j] = []
     links = []
     for i in range(NODE_COUNT):  # put particles randomly
-        Particle(random.randint(0, NUMBER_OF_TYPES - 1), random.random() * (WIDTH - 2 * NODE_RADIUS) +
-                     NUMBER_OF_TYPES, random.random() * (HEIGHT - 2 * NODE_RADIUS) + NUMBER_OF_TYPES)
+        Particle(random.randint(0, NUMBER_OF_TYPES - 1), random.random() * (WIDTH - 2 * NODE_RADIUS) + NUMBER_OF_TYPES,
+                 random.random() * (HEIGHT - 2 * NODE_RADIUS) + NUMBER_OF_TYPES)
 
 
 def applyForce(a, b):
-    d2 = (a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y)
-    canLink = False
-    if d2 < MAX_DIST2:
-        dA = COUPLING[a.type][b.type] / d2
-        dB = COUPLING[b.type][a.type] / d2
-        if a.links < LINKS[a.type] and b.links < LINKS[b.type]:
-            if d2 < MAX_DIST2 / 4:
-                if not b in a.bonds and not a in b.bonds:
-                    typeCountA = 0
+    distance2 = (a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y)
+    canlink = False
+    if distance2 < MAX_DIST2:
+        a_force = COUPLING[a.type][b.type] / distance2
+        b_force = COUPLING[b.type][a.type] / distance2
+        if a.links_number < LINKS[a.type] and b.links_number < LINKS[b.type]:
+            if distance2 < MAX_DIST2 / 4:
+                if b not in a.bonds and a not in b.bonds:
+                    type_count_a = 0
                     for p in a.bonds:
                         if p.type == b.type:
-                            typeCountA += 1
-                    typeCountB = 0
+                            type_count_a += 1
+                    type_count_b = 0
                     for p in b.bonds:
                         if p.type == a.type:
-                            typeCountB += 1
-                    if typeCountA < LINKS_POSSIBLE[a.type][b.type] and typeCountB < LINKS_POSSIBLE[b.type][a.type]:
-                        canLink = True
+                            type_count_b += 1
+                    if type_count_a < LINKS_POSSIBLE[a.type][b.type] and type_count_b < LINKS_POSSIBLE[b.type][a.type]:
+                        canlink = True
         else:
-            if not b in a.bonds and not a in b.bonds:
-                dA = 1 / d2
-                dB = 1 / d2
+            if b not in a.bonds and a not in b.bonds:
+                a_force = 1 / distance2
+                b_force = 1 / distance2
         angle = math.atan2(a.y - b.y, a.x - b.x)
-        if d2 < 1:
-            d2 = 1
-        if d2 < NODE_RADIUS * NODE_RADIUS * 4:
-            dA = 1 / d2
-            dB = 1 / d2
-        a.sx += math.cos(angle) * dA * SPEED
-        a.sy += math.sin(angle) * dA * SPEED
-        b.sx -= math.cos(angle) * dB * SPEED
-        b.sy -= math.sin(angle) * dB * SPEED
-    if canLink:
-        return d2
+        if distance2 < NODE_RADIUS * NODE_RADIUS * 4:
+            if distance2 < 1:
+                distance2 = 1
+            a_force = 1 / distance2
+            b_force = 1 / distance2
+        a.vx += math.cos(angle) * a_force * SPEED
+        a.vy += math.sin(angle) * a_force * SPEED
+        b.vx -= math.cos(angle) * b_force * SPEED
+        b.vy -= math.sin(angle) * b_force * SPEED
+    if canlink:
+        return distance2
     else:
         return -1
 
@@ -110,55 +103,55 @@ def mmmodel():
     for i in range(deltaW):
         for j in range(deltaH):
             for a in fields[i][j]:
-                a.x += a.sx
-                a.y += a.sy
-                a.sx *= 0.98
-                a.sy *= 0.98
+                a.x += a.vx
+                a.y += a.vy
+                a.vx *= 0.98
+                a.vy *= 0.98
                 # velocity normalization
                 # idk if it is still necessary
-                magnitude = math.sqrt(a.sx * a.sx + a.sy * a.sy)
+                magnitude = math.sqrt(a.vx * a.vx + a.vy * a.vy)
                 if magnitude > 1:
-                    a.sx /= magnitude
-                    a.sy /= magnitude
+                    a.vx /= magnitude
+                    a.vy /= magnitude
 
                 # border repulsion
                 if a.x < BORDER:
-                    a.sx += SPEED * 0.05
+                    a.vx += SPEED * 0.05
                     if a.x < 0:
                         a.x = -a.x
-                        a.sx *= -0.5
+                        a.vx *= -0.5
                 elif a.x > WIDTH - BORDER:
-                    a.sx -= SPEED * 0.05
+                    a.vx -= SPEED * 0.05
                     if a.x > WIDTH:
                         a.x = WIDTH * 2 - a.x
-                        a.sx *= -0.5
+                        a.vx *= -0.5
                 if a.y < BORDER:
-                    a.sy += SPEED * 0.05
+                    a.vy += SPEED * 0.05
                     if a.y < 0:
                         a.y = -a.y
-                        a.sy *= -0.5
+                        a.vy *= -0.5
                 elif a.y > HEIGHT - BORDER:
-                    a.sy -= SPEED * 0.05
+                    a.vy -= SPEED * 0.05
                     if a.y > HEIGHT:
                         a.y = HEIGHT * 2 - a.y
-                        a.sy *= -0.5
+                        a.vy *= -0.5
     for link in links:
         a = link.a
         b = link.b
         d2 = (a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y)
         if d2 > MAX_DIST2 / 4:
-            a.links -= 1
-            b.links -= 1
+            a.links_number -= 1
+            b.links_number -= 1
             a.bonds.remove(b)
             b.bonds.remove(a)
             links.remove(link)
             i -= 1
         elif d2 > NODE_RADIUS * NODE_RADIUS * 4:
             angle = math.atan2(a.y - b.y, a.x - b.x)
-            a.sx += math.cos(angle) * LINK_FORCE * SPEED
-            a.sy += math.sin(angle) * LINK_FORCE * SPEED
-            b.sx -= math.cos(angle) * LINK_FORCE * SPEED
-            b.sy -= math.sin(angle) * LINK_FORCE * SPEED
+            a.vx += math.cos(angle) * LINK_FORCE * SPEED
+            a.vy += math.sin(angle) * LINK_FORCE * SPEED
+            b.vx -= math.cos(angle) * LINK_FORCE * SPEED
+            b.vy -= math.sin(angle) * LINK_FORCE * SPEED
 
     # moving particle to another field
     for i in range(deltaW):
@@ -204,6 +197,6 @@ def mmmodel():
                 if particleToLink != 0:
                     a.bonds.append(particleToLink)
                     particleToLink.bonds.append(a)
-                    a.links += 1
-                    particleToLink.links += 1
+                    a.links_number += 1
+                    particleToLink.links_number += 1
                     links.append(Link(a, particleToLink))
