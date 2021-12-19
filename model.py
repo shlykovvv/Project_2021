@@ -2,6 +2,7 @@ import random
 import math
 import ui
 from constants import COLORS, WIDTH, HEIGHT, MAX_DIST, BORDER
+from tkinter import filedialog
 
 # Maximum interaction distance between particles
 MAX_DIST2 = MAX_DIST * MAX_DIST
@@ -137,6 +138,27 @@ def create_new_world():
     In the new world, the "fields" and "links" lists are reset, and all particles are generated
     """
     generate_rules()
+    global fields, links
+    # Zeroing a twice nested list storing particles
+    fields = [0] * deltaW
+    for i in range(deltaW):
+        fields[i] = [0] * deltaH
+        for j in range(deltaH):
+            fields[i][j] = []
+    links = []
+    # Put particles randomly
+    for i in range(ui.NODE_COUNT):
+        Particle(random.randint(0, ui.NUMBER_OF_TYPES - 1), random.random() * (WIDTH - 2 * ui.NODE_RADIUS) +
+                 ui.NUMBER_OF_TYPES, random.random() * (HEIGHT - 2 * ui.NODE_RADIUS) + ui.NUMBER_OF_TYPES)
+
+
+def open_world():
+    """
+    Opens world with laws from file
+    """
+    global LINKS, LINKS_POSSIBLE, COUPLING
+    LINKS, LINKS_POSSIBLE, COUPLING = ui.read_laws_from_file(filedialog.askopenfilename(filetypes=(("Text file",
+                                                                                                    ".txt"))))
     global fields, links
     # Zeroing a twice nested list storing particles
     fields = [0] * deltaW

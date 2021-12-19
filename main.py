@@ -1,4 +1,3 @@
-import pygame
 import pygame.draw
 import model
 from constants import FPS, BACKGROUND_COLOR
@@ -29,6 +28,8 @@ while not finished:
                     opened = False
                 if 347 <= mouse[1] <= 387 and opened:
                     model.create_new_world()
+            if 184 <= mouse[0] <= 250 and 62 <= mouse[1] <= 80 and opened:
+                model.open_world()
             if 20 <= mouse[0] <= 40 and 20 <= mouse[1] <= 40 and not opened:
                 opened = True
         pressed = pygame.mouse.get_pressed()

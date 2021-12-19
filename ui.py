@@ -1,5 +1,4 @@
 import pygame
-import sys
 from constants import WIDTH, HEIGHT
 
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -50,3 +49,19 @@ def change_characteristics():
     SPEED = int((controllers['speed']['x'] - 26) / 220 * 400) / 10
     SIMULATIONS_PER_FRAME = int(1 + (controllers['frame']['x'] - 2) / 220 * 9)
     NUMBER_OF_TYPES = int(1 + (controllers['types']['x'] - 2) / 220 * 8)
+
+
+def read_laws_from_file(input_filename):
+    with open(input_filename, 'r') as input_file:
+        i = 0
+        lines_conv = [0] * 7
+        for line in input_file:
+            lines_conv[i] = line.split(',')
+            for j in range(len(lines_conv[i])):
+                lines_conv[i][j] = int(lines_conv[i][j])
+            i += 1
+        links_possible, coupling = [0] * 3, [0] * 3
+        for k in range(3):
+            links_possible[k] = lines_conv[k + 1]
+            coupling[k] = lines_conv[k + 4]
+        return lines_conv[0], links_possible, coupling
