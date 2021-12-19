@@ -22,7 +22,7 @@ controllers = {'force': {'x': 26 - (LINK_FORCE / 0.04) * 220, 'y': 123},
                'speed': {'x': 26 + (SPEED / 40) * 220, 'y': 183},
                'frame': {'x': 26 + (SIMULATIONS_PER_FRAME - 1) * 24, 'y': 213},
                'types': {'x': 26 + (NUMBER_OF_TYPES - 1) * 27, 'y': 295},
-               'count': {'x': 26 + (NODE_COUNT / 300) * 220, 'y': 325},
+               'count': {'x': 26 + (NODE_COUNT / 450) * 220, 'y': 325},
                'connections': True, 'brush': 0}
 
 
@@ -43,9 +43,10 @@ def change_controllers(mouse):
 
 
 def change_characteristics():
-    global NODE_COUNT, LINK_FORCE, NODE_RADIUS, SPEED, SIMULATIONS_PER_FRAME
+    global NODE_COUNT, LINK_FORCE, NODE_RADIUS, SPEED, SIMULATIONS_PER_FRAME, NUMBER_OF_TYPES
     LINK_FORCE = - int((controllers['force']['x'] - 26) / 220 * 40) / 1000
-    NODE_COUNT = int((controllers['count']['x'] - 26) / 220 * 300)
+    NODE_COUNT = int((controllers['count']['x'] - 26) / 220 * 450)
     NODE_RADIUS = int(300 + (controllers['radius']['x'] - 26) / 220 * 700) / 100
     SPEED = int((controllers['speed']['x'] - 26) / 220 * 400) / 10
     SIMULATIONS_PER_FRAME = int(1 + (controllers['frame']['x'] - 2) / 220 * 9)
+    NUMBER_OF_TYPES = int(1 + (controllers['types']['x'] - 2) / 220 * 8)
