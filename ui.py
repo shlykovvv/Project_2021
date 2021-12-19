@@ -11,6 +11,7 @@ SIMULATIONS_PER_FRAME = 2
 NODE_RADIUS = 5
 LINK_FORCE = - 0.015
 SPEED = 4
+type_for_click = 0
 
 color_light = (170, 170, 170)
 color_dark = (120, 120, 120)
@@ -56,7 +57,7 @@ def change_characteristics():
 
 
 def read_laws_from_file(input_filename):
-    """this functions reads laws of the world from a certain file"""  
+    """this functions reads laws of the world from a certain file"""
     with open(input_filename, 'r') as input_file:
         i = 0
         lines_conv = [0] * 50
