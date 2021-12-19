@@ -1,21 +1,21 @@
 import pygame
+import sys
 from constants import WIDTH, HEIGHT
 
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 
+"""main parameters"""
 NUMBER_OF_TYPES = 3
 NODE_COUNT = 250
 SIMULATIONS_PER_FRAME = 2
-
 NODE_RADIUS = 5
 LINK_FORCE = - 0.015
 SPEED = 4
 
-type_for_click = 0
-
 color_light = (170, 170, 170)
 color_dark = (120, 120, 120)
 
+"""info about all controllers like sliders, buttons, etc."""
 controllers = {'force': {'x': 26 - (LINK_FORCE / 0.04) * 220, 'y': 123},
                'radius': {'x': 26 + ((NODE_RADIUS - 3) / 7) * 220, 'y': 153},
                'speed': {'x': 26 + (SPEED / 40) * 220, 'y': 183},
@@ -26,6 +26,7 @@ controllers = {'force': {'x': 26 - (LINK_FORCE / 0.04) * 220, 'y': 123},
 
 
 def change_controllers(mouse):
+    """this function changes the parameters of 'controllers' using mouse's coordinates"""
     x, y = mouse[0], mouse[1]
     for s in controllers:
         if s != 'connections' and s != 'brush':
@@ -37,11 +38,14 @@ def change_controllers(mouse):
                     controllers[s] = False
                 else:
                     controllers[s] = True
-    controllers['frame']['x'] = ((controllers['frame']['x'] - 26) // 24) * 24 + 26
+        if s == 'brush' and 420 <= y <= 460:
+            controllers[s] = int((x - 30) / 220 * NUMBER_OF_TYPES)
+    controllers['frame']['x'] = int((controllers['frame']['x'] - 26) / 24) * 24 + 26
     controllers['types']['x'] = int((controllers['types']['x'] - 26) / 27) * 27 + 26
 
 
 def change_characteristics():
+    """this function changes values of main parameters using sliders' positions"""
     global NODE_COUNT, LINK_FORCE, NODE_RADIUS, SPEED, SIMULATIONS_PER_FRAME, NUMBER_OF_TYPES
     LINK_FORCE = - int((controllers['force']['x'] - 26) / 220 * 40) / 1000
     NODE_COUNT = int((controllers['count']['x'] - 26) / 220 * 450)
@@ -52,6 +56,7 @@ def change_characteristics():
 
 
 def read_laws_from_file(input_filename):
+    """this functions reads laws of the world from a certain file"""  
     with open(input_filename, 'r') as input_file:
         i = 0
         lines_conv = [0] * 50
@@ -68,6 +73,7 @@ def read_laws_from_file(input_filename):
 
 
 def write_laws_to_file(output_filename, links, links_possible, coupling):
+    """this function wtites laws of the world to a certain file"""
     with open(output_filename, 'w') as out_file:
         for i in range(len(links)):
             out_file.write(str(links[i]))
