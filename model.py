@@ -158,7 +158,7 @@ def open_world():
     """
     global LINKS, LINKS_POSSIBLE, COUPLING
     LINKS, LINKS_POSSIBLE, COUPLING = ui.read_laws_from_file(filedialog.askopenfilename(filetypes=(("Text file",
-                                                                                                    ".txt"))))
+                                                                                                    ".txt"),)))
     global fields, links
     # Zeroing a twice nested list storing particles
     fields = [0] * deltaW

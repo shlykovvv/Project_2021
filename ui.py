@@ -60,8 +60,28 @@ def read_laws_from_file(input_filename):
             for j in range(len(lines_conv[i])):
                 lines_conv[i][j] = int(lines_conv[i][j])
             i += 1
-        links_possible, coupling = [0] * 3, [0] * 3
-        for k in range(3):
+        links_possible, coupling = [0] * len(lines_conv[0]), [0] * len(lines_conv[0])
+        for k in range(len(lines_conv[0])):
             links_possible[k] = lines_conv[k + 1]
-            coupling[k] = lines_conv[k + 4]
+            coupling[k] = lines_conv[k + len(lines_conv[0]) + 1]
         return lines_conv[0], links_possible, coupling
+
+
+def write_laws_to_file(output_filename, links, links_possible, coupling):
+    with open(output_filename, 'w') as out_file:
+        for i in range(len(links)):
+            out_file.write(str(links[i]))
+            if i < len(links) - 1:
+                out_file.write(',')
+        for i in range(len(links)):
+            out_file.write("\n")
+            for j in range(len(links)):
+                out_file.write(str(links_possible[i][j]))
+                if j < len(links) - 1:
+                    out_file.write(',')
+        for i in range(len(links)):
+            out_file.write("\n")
+            for j in range(len(links)):
+                out_file.write(str(coupling[i][j]))
+                if j < len(links) - 1:
+                    out_file.write(',')

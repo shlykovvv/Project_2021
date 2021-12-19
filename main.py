@@ -30,6 +30,8 @@ while not finished:
                     model.create_new_world()
             if 184 <= mouse[0] <= 250 and 62 <= mouse[1] <= 80 and opened:
                 model.open_world()
+            if 184 <= mouse[0] <= 250 and 40 <= mouse[1] <= 58:
+                ui.write_laws_to_file("output.txt", model.LINKS, model.LINKS_POSSIBLE, model.COUPLING)
             if 20 <= mouse[0] <= 40 and 20 <= mouse[1] <= 40 and not opened:
                 opened = True
         pressed = pygame.mouse.get_pressed()
