@@ -130,9 +130,6 @@ def generate_rules():
         for j in range(ui.NUMBER_OF_TYPES):
             LINKS_POSSIBLE[i].append(math.floor(random.random() * 4))
             COUPLING[i].append(math.floor(random.random() * 3 - 1))
-    print(LINKS)###
-    print(LINKS_POSSIBLE)
-    print(COUPLING)
 
 
 def create_new_world():
