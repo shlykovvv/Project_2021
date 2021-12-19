@@ -23,13 +23,17 @@ while not finished:
             if mouse[0] <= WIDTH and mouse[1] <= HEIGHT:
                 model.Particle(ui.type_for_click, mouse[0], mouse[1])
             if 30 <= mouse[0] <= 250:
-                ui.controllers_info(mouse)
                 if 40 <= mouse[1] <= 80 and opened:
                     opened = False
                 if 347 <= mouse[1] <= 387 and opened:
                     model.create_new_world()
             if 20 <= mouse[0] <= 40 and 20 <= mouse[1] <= 40 and not opened:
                 opened = True
+        pressed = pygame.mouse.get_pressed()
+        if pressed[0] and opened:
+            if 30 <= mouse[0] <= 250:
+                ui.change_controllers(mouse)
+            ui.change_characteristics()
     ui.screen.fill(BACKGROUND_COLOR)
     for i in range(ui.SIMULATIONS_PER_FRAME):
         model.mmmodel()
@@ -38,8 +42,8 @@ while not finished:
         view.draw_links(model.links)
     if opened:
         view.draw_settings()
-        ui.draw_controllers()
-        ui.draw_buttons(mouse)
+        view.draw_controllers()
+        view.draw_buttons(mouse)
         view.print_text()
     else:
         view.draw_closed_settings()
