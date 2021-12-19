@@ -20,9 +20,9 @@ while not finished:
             finished = True
         if event.type == pygame.MOUSEBUTTONDOWN:
             if opened and not (20 <= mouse[0] <= 260 and 20 <= mouse[1] <= 480):
-                model.Particle(ui.type_for_click, mouse[0], mouse[1])
+                model.Particle(ui.controllers['brush'], mouse[0], mouse[1])
             elif not opened and not (20 <= mouse[0] <= 40 and 20 <= mouse[1] <= 40):
-                model.Particle(ui.type_for_click, mouse[0], mouse[1])
+                model.Particle(ui.controllers['brush'], mouse[0], mouse[1])
             if 30 <= mouse[0] <= 250:
                 if 40 <= mouse[1] <= 80 and 30 <= mouse[0] <= 180 and opened:
                     opened = False
