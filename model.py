@@ -118,6 +118,9 @@ class Link:
 
 
 def generate_rules():
+    """
+    Generates the laws of the new world
+    """
     global LINKS, LINKS_POSSIBLE, COUPLING
     LINKS, LINKS_POSSIBLE, COUPLING = [], [], []
     for i in range(ui.NUMBER_OF_TYPES):
@@ -127,34 +130,48 @@ def generate_rules():
         for j in range(ui.NUMBER_OF_TYPES):
             LINKS_POSSIBLE[i].append(math.floor(random.random() * 4))
             COUPLING[i].append(math.floor(random.random() * 3 - 1))
-    print(LINKS)
+    print(LINKS)###
     print(LINKS_POSSIBLE)
     print(COUPLING)
 
 
 def create_new_world():
+    """
+    In the new world, the "fields" and "links" lists are reset, and all particles are generated
+    """
     generate_rules()
     global fields, links
-    fields = [0] * deltaW  # array for dividing scene into parts to reduce complexity
+    # Zeroing a twice nested list storing particles
+    fields = [0] * deltaW
     for i in range(deltaW):
         fields[i] = [0] * deltaH
         for j in range(deltaH):
             fields[i][j] = []
     links = []
-    for i in range(ui.NODE_COUNT):  # put particles randomly
+    # Put particles randomly
+    for i in range(ui.NODE_COUNT):
         Particle(random.randint(0, ui.NUMBER_OF_TYPES - 1), random.random() * (WIDTH - 2 * ui.NODE_RADIUS) +
                  ui.NUMBER_OF_TYPES, random.random() * (HEIGHT - 2 * ui.NODE_RADIUS) + ui.NUMBER_OF_TYPES)
 
 
 def check_canlink(a: Particle, b: Particle, distance2):
+    """
+    Checks whether a bond can be formed between two particles
+    :param a: the first particle
+    :param b: the second particle
+    :param distance2: the distance between the particles squared
+    :return: boolean
+    """
     canlink = False
     if distance2 < MAX_DIST2 / 4:
         if a.links_number < LINKS[a.type] and b.links_number < LINKS[b.type]:
             if b not in a.bonds and a not in b.bonds:
+                # Counting of type b particles located in a.bonds
                 type_count_a = 0
                 for p in a.bonds:
                     if p.type == b.type:
                         type_count_a += 1
+                # Counting of type a particles located in b.bonds
                 type_count_b = 0
                 for p in b.bonds:
                     if p.type == a.type:
@@ -165,6 +182,12 @@ def check_canlink(a: Particle, b: Particle, distance2):
 
 
 def calc_interaction(a: Particle, b: Particle, distance2):
+    """
+    Calculates the change in the velocity of particles due to their interaction
+    :param a: the first particle
+    :param b: the second particle
+    :param distance2: the distance between the particles squared
+    """
     if distance2 < MAX_DIST2:
         a_force = COUPLING[a.type][b.type] / distance2
         b_force = COUPLING[b.type][a.type] / distance2
@@ -185,6 +208,15 @@ def calc_interaction(a: Particle, b: Particle, distance2):
 
 
 def search_to_link_and_interact(a, b, particle_to_link, min_dist2):
+    """
+    Runs through all pairs of particles capable of interacting. Searches for the nearest particle to form a bond with
+    each particle, simultaneously calculates the interaction in pairs of particles
+    :param a: the first particle
+    :param b: the second particle
+    :param particle_to_link: the current nearest particle to form a bond with particle "a"
+    :param min_dist2: the distance to this particle squared
+    :return: Particle, float
+    """
     distance2 = (a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y)
     calc_interaction(a, b, distance2)
     if distance2 < min_dist2:
@@ -196,15 +228,22 @@ def search_to_link_and_interact(a, b, particle_to_link, min_dist2):
         return particle_to_link, min_dist2
 
 
-def mmmodel():
+def central_modeling():
+    """
+    The main function that simulates all interactions of each frame
+    """
+    # Working with connections
     for link in links:
         link.break_or_attract()
 
+    # A cycle that iterates over all particles in all fields
     for i in range(deltaW):
         for j in range(deltaH):
             for a in fields[i][j]:
                 particle_to_link = 0
                 min_dist2 = (WIDTH + HEIGHT) ** 2
+                # Iterating over all the particles for interaction from their own field, as well as from 4 neighboring
+                # fields (there are 8 neighboring fields in total, so we will iterate over all interactions in pairs)
                 for b in fields[i][j]:
                     if b != a:
                         particle_to_link, min_dist2 = search_to_link_and_interact(a, b, particle_to_link, min_dist2)
@@ -224,6 +263,7 @@ def mmmodel():
                         i_prev = i - 1
                         for b in fields[i_prev][j_next]:
                             particle_to_link, min_dist2 = search_to_link_and_interact(a, b, particle_to_link, min_dist2)
+                # Formation of a bond with the nearest particle
                 if particle_to_link != 0:
                     a.bonds.append(particle_to_link)
                     particle_to_link.bonds.append(a)
@@ -231,5 +271,6 @@ def mmmodel():
                     particle_to_link.links_number += 1
                     links.append(Link(a, particle_to_link))
 
+                # In the same cycle, we move the particles and, if necessary, move them between the fields
                 a.move()
                 a.check_to_change_field(i, j)

@@ -36,7 +36,7 @@ while not finished:
             ui.change_characteristics()
     ui.screen.fill(BACKGROUND_COLOR)
     for i in range(ui.SIMULATIONS_PER_FRAME):
-        model.mmmodel()
+        model.central_modeling()
     view.draw_particles(model.fields)
     if ui.controllers['connections']:
         view.draw_links(model.links)
