@@ -6,6 +6,7 @@ from model import deltaW, deltaH
 
 
 def draw_particles(fields):
+    """this function draws all particles"""
     for i in range(deltaW):
         for j in range(deltaH):
             for a in fields[i][j]:
@@ -13,10 +14,12 @@ def draw_particles(fields):
 
 
 def calc_coord_for_link(z1, z2, dist):
+    """this function calculates the coordinate of link"""
     return z1 + (z2 - z1) * ui.NODE_RADIUS / dist
 
 
 def draw_links(links):
+    """this function draws all links"""
     for link in links:
         dist = ((link.b.x - link.a.x) ** 2 + (link.b.y - link.a.y) ** 2) ** 0.5
         link_color = ((link.a.color[0] + link.b.color[0]) / 2, (link.a.color[1] + link.b.color[1]) / 2,
@@ -28,6 +31,7 @@ def draw_links(links):
 
 
 def draw_settings():
+    """this function draws translucent plane for all settings"""
     surf = pygame.Surface((WIDTH, HEIGHT))
     surf.set_alpha(140)
     pygame.draw.rect(surf, 'white', (20, 20, 240, HEIGHT - 40))
@@ -35,6 +39,7 @@ def draw_settings():
 
 
 def draw_closed_settings():
+    """this function draws the version of closed settings"""
     surf = pygame.Surface((WIDTH, HEIGHT))
     surf.set_alpha(160)
     pygame.draw.rect(surf, 'white', (20, 20, 20, 20))
@@ -44,6 +49,7 @@ def draw_closed_settings():
 
 
 def print_text():
+    """this function prints all texts that are needed in settings"""
     font = pygame.font.SysFont(None, 20)
     small_font = pygame.font.SysFont(None, 12)
     medium_font = pygame.font.SysFont(None, 16)
@@ -78,6 +84,7 @@ def print_text():
 
 
 def draw_buttons(mouse):
+    """this function draws buttons light or dark depending on mouse's coordinates"""
     if 30 <= mouse[0] <= 250 and 347 <= mouse[1] <= 387:
         pygame.draw.rect(ui.screen, ui.color_light, [30, 347, 220, 40])
     else:
@@ -97,6 +104,7 @@ def draw_buttons(mouse):
 
 
 def draw_controllers():
+    """this function draws all kinds of controllers"""
     for s in ui.controllers:
         if s != 'connections' and s != 'brush':
             pygame.draw.rect(ui.screen, (150, 150, 150), [30, ui.controllers[s]['y'], 220, 6])
@@ -110,3 +118,6 @@ def draw_controllers():
             for i in range(ui.NUMBER_OF_TYPES):
                 pygame.draw.rect(ui.screen, COLORS[i],
                                  [30 + i * 220 / ui.NUMBER_OF_TYPES, 420, 220 / ui.NUMBER_OF_TYPES + 1, 40])
+            x = 21 + ui.controllers[s] * 220 / ui.NUMBER_OF_TYPES + 110 / ui.NUMBER_OF_TYPES
+            pygame.draw.polygon(ui.screen, 'white',
+                                [(x+6, 450), (x, 444), (x+2, 442), (x+6, 446), (x+16, 430), (x+18, 432)])
