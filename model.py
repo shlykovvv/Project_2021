@@ -75,6 +75,11 @@ class Particle:
                 self.y = HEIGHT * 2 - self.y
                 self.vy *= -0.5
 
+    def check_to_change_field(self, i, j):
+        if (round(self.x / MAX_DIST) != i) or (round(self.y / MAX_DIST) != j):
+            fields[i][j].remove(self)
+            fields[round(self.x / MAX_DIST)][round(self.y / MAX_DIST)].append(self)
+
 
 LINKS, LINKS_POSSIBLE, COUPLING = [], [], []
 links, fields = [], []
@@ -130,7 +135,7 @@ def check_canlink(a: Particle, b: Particle, distance2):
     return canlink
 
 
-def calc_interactions(a: Particle, b: Particle, distance2):
+def calc_interaction(a: Particle, b: Particle, distance2):
     if distance2 < MAX_DIST2:
         a_force = COUPLING[a.type][b.type] / distance2
         b_force = COUPLING[b.type][a.type] / distance2
@@ -150,6 +155,18 @@ def calc_interactions(a: Particle, b: Particle, distance2):
         b.vy -= math.sin(angle) * b_force * ui.SPEED
 
 
+def search_to_link_and_interact(a, b, particle_to_link, min_dist2):
+    distance2 = (a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y)
+    calc_interaction(a, b, distance2)
+    if distance2 < min_dist2:
+        if check_canlink(a, b, distance2):
+            return b, distance2
+        else:
+            return particle_to_link, min_dist2
+    else:
+        return particle_to_link, min_dist2
+
+
 def mmmodel():
     for link in links:
         link.break_or_attract()
@@ -158,59 +175,32 @@ def mmmodel():
         for j in range(deltaH):
             for a in fields[i][j]:
                 particle_to_link = 0
-                particle_to_link_min_dist2 = (WIDTH + HEIGHT) ** 2
+                min_dist2 = (WIDTH + HEIGHT) ** 2
                 for b in fields[i][j]:
                     if b != a:
-                        distance2 = (a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y)
-                        calc_interactions(a, b, distance2)
-                        if distance2 < particle_to_link_min_dist2:
-                            if check_canlink(a, b, distance2):
-                                particle_to_link_min_dist2 = distance2
-                                particle_to_link = b
+                        particle_to_link, min_dist2 = search_to_link_and_interact(a, b, particle_to_link, min_dist2)
                 if i < deltaW - 1:
                     i_next = i + 1
                     for b in fields[i_next][j]:
-                        distance2 = (a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y)
-                        calc_interactions(a, b, distance2)
-                        if distance2 < particle_to_link_min_dist2:
-                            if check_canlink(a, b, distance2):
-                                particle_to_link_min_dist2 = distance2
-                                particle_to_link = b
+                        particle_to_link, min_dist2 = search_to_link_and_interact(a, b, particle_to_link, min_dist2)
                 if j < deltaH - 1:
                     j_next = j + 1
                     for b in fields[i][j_next]:
-                        distance2 = (a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y)
-                        calc_interactions(a, b, distance2)
-                        if distance2 < particle_to_link_min_dist2:
-                            if check_canlink(a, b, distance2):
-                                particle_to_link_min_dist2 = distance2
-                                particle_to_link = b
+                        particle_to_link, min_dist2 = search_to_link_and_interact(a, b, particle_to_link, min_dist2)
                     if i < deltaW - 1:
                         i_next = i + 1
                         for b in fields[i_next][j_next]:
-                            distance2 = (a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y)
-                            calc_interactions(a, b, distance2)
-                            if distance2 < particle_to_link_min_dist2:
-                                if check_canlink(a, b, distance2):
-                                    particle_to_link_min_dist2 = distance2
-                                    particle_to_link = b
+                            particle_to_link, min_dist2 = search_to_link_and_interact(a, b, particle_to_link, min_dist2)
                     if i > 0:
                         i_prev = i - 1
                         for b in fields[i_prev][j_next]:
-                            distance2 = (a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y)
-                            calc_interactions(a, b, distance2)
-                            if distance2 < particle_to_link_min_dist2:
-                                if check_canlink(a, b, distance2):
-                                    particle_to_link_min_dist2 = distance2
-                                    particle_to_link = b
+                            particle_to_link, min_dist2 = search_to_link_and_interact(a, b, particle_to_link, min_dist2)
                 if particle_to_link != 0:
                     a.bonds.append(particle_to_link)
                     particle_to_link.bonds.append(a)
                     a.links_number += 1
                     particle_to_link.links_number += 1
                     links.append(Link(a, particle_to_link))
+
                 a.move()
-                # moving particle to another field
-                if (round(a.x / MAX_DIST) != i) or (round(a.y / MAX_DIST) != j):
-                    fields[i][j].remove(a)
-                    fields[round(a.x / MAX_DIST)][round(a.y / MAX_DIST)].append(a)
+                a.check_to_change_field(i, j)
