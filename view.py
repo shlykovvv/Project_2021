@@ -52,12 +52,12 @@ def print_text():
     text_current = font.render('CURRENT WORLD SETTINGS', True, (0, 0, 0))
     text_new = font.render('NEW WORLD SETTINGS', True, (0, 0, 0))
     text_brush = font.render('PARTICLE BRUSH', True, (0, 0, 0))
-    text_force = small_font.render('LINK FORCE:', True, (70, 70, 70))
-    text_radius = small_font.render('PARTICLE RADIUS:', True, (70, 70, 70))
-    text_speed = small_font.render('PARTICLE SPEED:', True, (70, 70, 70))
-    text_frame = small_font.render('SIMULATIONS PER FRAME:', True, (70, 70, 70))
+    text_force = small_font.render('LINK FORCE: ' + str(ui.LINK_FORCE), True, (70, 70, 70))
+    text_radius = small_font.render('PARTICLE RADIUS: ' + str(ui.NODE_RADIUS), True, (70, 70, 70))
+    text_speed = small_font.render('PARTICLE SPEED: ' + str(ui.SPEED), True, (70, 70, 70))
+    text_frame = small_font.render('SIMULATIONS PER FRAME: ' + str(ui.SIMULATIONS_PER_FRAME), True, (70, 70, 70))
     text_types = small_font.render('PARTICLE TYPES AMOUNT:', True, (70, 70, 70))
-    text_count = small_font.render('PARTICLE COUNT:', True, (70, 70, 70))
+    text_count = small_font.render('PARTICLE COUNT: ' + str(ui.NODE_COUNT), True, (70, 70, 70))
     text_connect = medium_font.render('DRAW CONNECTIONS', True, (0, 0, 0))
     ui.screen.blit(text_create, (70, 361))
     ui.screen.blit(text_close, (82, 53))
@@ -71,3 +71,26 @@ def print_text():
     ui.screen.blit(text_types, (30, 280))
     ui.screen.blit(text_count, (30, 310))
     ui.screen.blit(text_connect, (60, 235))
+
+
+def draw_buttons(mouse):
+    if 30 <= mouse[0] <= 250 and 347 <= mouse[1] <= 387:
+        pygame.draw.rect(ui.screen, ui.color_light, [30, 347, 220, 40])
+    else:
+        pygame.draw.rect(ui.screen, ui.color_dark, [30, 347, 220, 40])
+    if 30 <= mouse[0] <= 250 and 40 <= mouse[1] <= 80:
+        pygame.draw.rect(ui.screen, ui.color_light, [30, 40, 220, 40])
+    else:
+        pygame.draw.rect(ui.screen, ui.color_dark, [30, 40, 220, 40])
+
+
+def draw_controllers():
+    for s in ui.controllers:
+        if s != 'connections' and s != 'brush':
+            pygame.draw.rect(ui.screen, (150, 150, 150), [30, ui.controllers[s]['y'], 220, 6])
+            pygame.draw.rect(ui.screen, (100, 100, 100), [ui.controllers[s]['x'], ui.controllers[s]['y'] - 3, 8, 12])
+        if s == 'connections':
+            pygame.draw.rect(ui.screen, ui.color_dark, [30, 230, 20, 20])
+            if ui.controllers[s]:
+                pygame.draw.polygon(ui.screen, 'white',
+                                    [(36, 250), (30, 244), (32, 242), (36, 246), (48, 230), (50, 232)])
