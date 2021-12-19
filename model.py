@@ -157,8 +157,8 @@ def open_world():
     Opens world with laws from file
     """
     global LINKS, LINKS_POSSIBLE, COUPLING
-    LINKS, LINKS_POSSIBLE, COUPLING = ui.read_laws_from_file(filedialog.askopenfilename(filetypes=(("Text file",
-                                                                                                    ".txt"),)))
+    LINKS, LINKS_POSSIBLE, COUPLING, number_of_types = ui.read_laws_from_file(filedialog.askopenfilename
+                                                                              (filetypes=(("Text file",".txt"),)))
     global fields, links
     # Zeroing a twice nested list storing particles
     fields = [0] * deltaW
@@ -169,8 +169,8 @@ def open_world():
     links = []
     # Put particles randomly
     for i in range(ui.NODE_COUNT):
-        Particle(random.randint(0, ui.NUMBER_OF_TYPES - 1), random.random() * (WIDTH - 2 * ui.NODE_RADIUS) +
-                 ui.NUMBER_OF_TYPES, random.random() * (HEIGHT - 2 * ui.NODE_RADIUS) + ui.NUMBER_OF_TYPES)
+        Particle(random.randint(0, number_of_types - 1), random.random() * (WIDTH - 2 * ui.NODE_RADIUS) +
+                 number_of_types, random.random() * (HEIGHT - 2 * ui.NODE_RADIUS) + number_of_types)
 
 
 def check_canlink(a: Particle, b: Particle, distance2):

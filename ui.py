@@ -64,7 +64,7 @@ def read_laws_from_file(input_filename):
         for k in range(len(lines_conv[0])):
             links_possible[k] = lines_conv[k + 1]
             coupling[k] = lines_conv[k + len(lines_conv[0]) + 1]
-        return lines_conv[0], links_possible, coupling
+        return lines_conv[0], links_possible, coupling, len(lines_conv[0])
 
 
 def write_laws_to_file(output_filename, links, links_possible, coupling):
