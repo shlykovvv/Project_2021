@@ -20,10 +20,12 @@ while not finished:
         if event.type == pygame.QUIT:
             finished = True
         if event.type == pygame.MOUSEBUTTONDOWN:
-            if mouse[0] <= WIDTH and mouse[1] <= HEIGHT:
+            if opened and not (20 <= mouse[0] <= 260 and 20 <= mouse[1] <= 480):
+                model.Particle(ui.type_for_click, mouse[0], mouse[1])
+            elif not opened and not (20 <= mouse[0] <= 40 and 20 <= mouse[1] <= 40):
                 model.Particle(ui.type_for_click, mouse[0], mouse[1])
             if 30 <= mouse[0] <= 250:
-                if 40 <= mouse[1] <= 80 and opened:
+                if 40 <= mouse[1] <= 80 and 30 <= mouse[0] <= 180 and opened:
                     opened = False
                 if 347 <= mouse[1] <= 387 and opened:
                     model.create_new_world()
@@ -36,7 +38,7 @@ while not finished:
             ui.change_characteristics()
     ui.screen.fill(BACKGROUND_COLOR)
     for i in range(ui.SIMULATIONS_PER_FRAME):
-        model.central_modeling()
+        model.mmmodel()
     view.draw_particles(model.fields)
     if ui.controllers['connections']:
         view.draw_links(model.links)
