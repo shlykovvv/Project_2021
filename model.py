@@ -3,34 +3,29 @@ import math
 import ui
 from constants import COLORS, WIDTH, HEIGHT, MAX_DIST, BORDER
 
+# Maximum interaction distance between particles
 MAX_DIST2 = MAX_DIST * MAX_DIST
+# Values for dividing the screen into rectangular fields
 deltaW = WIDTH // MAX_DIST + 1
 deltaH = HEIGHT // MAX_DIST + 1
 
-
-class Link:
-    def __init__(self, a, b):
-        self.a = a
-        self.b = b
-
-    def break_or_attract(self):
-        dist2 = (self.a.x - self.b.x) ** 2 + (self.a.y - self.b.y) ** 2
-        if dist2 > MAX_DIST2 / 4:
-            self.a.links_number -= 1
-            self.b.links_number -= 1
-            self.a.bonds.remove(self.b)
-            self.b.bonds.remove(self.a)
-            links.remove(self)
-        elif dist2 > ui.NODE_RADIUS * ui.NODE_RADIUS * 4:
-            angle = math.atan2(self.a.y - self.b.y, self.a.x - self.b.x)
-            self.a.vx += math.cos(angle) * ui.LINK_FORCE * ui.SPEED
-            self.a.vy += math.sin(angle) * ui.LINK_FORCE * ui.SPEED
-            self.b.vx -= math.cos(angle) * ui.LINK_FORCE * ui.SPEED
-            self.b.vy -= math.sin(angle) * ui.LINK_FORCE * ui.SPEED
+# Matrices responsible for the laws of the world
+LINKS, LINKS_POSSIBLE, COUPLING = [], [], []
+# A list of all links, a list of all fields (the screen is divided into fields to reduce complexity)
+links, fields = [], []
 
 
 class Particle:
+    """
+    This class is responsible for the particle, her movement and attributes
+    """
     def __init__(self, particle_type, x, y):
+        """
+        Initializes an object of the Particle class, adds it to the field appropriate to its position
+        :param particle_type: the type of particle responsible for its distinctive features
+        :param x: horizontal position
+        :param y: vertical position
+        """
         self.type = particle_type
         self.x = x
         self.y = y
@@ -42,18 +37,22 @@ class Particle:
         fields[round(self.x / MAX_DIST)][round(self.y / MAX_DIST)].append(self)
 
     def move(self):
+        """
+        Moves the particle according to its velocity, reflects it off the walls
+        """
         self.x += self.vx
         self.y += self.vy
+        # Deceleration due to friction force
         self.vx *= 0.98
         self.vy *= 0.98
-        # velocity normalization
-        # idk if it is still necessary
+
+        # Prevention of abnormal speeds
         magnitude = math.sqrt(self.vx * self.vx + self.vy * self.vy)
         if magnitude > 1:
             self.vx /= magnitude
             self.vy /= magnitude
 
-        # border repulsion
+        # Reflection from the walls
         if self.x < BORDER:
             self.vx += ui.SPEED * 0.05
             if self.x < 0:
@@ -76,13 +75,46 @@ class Particle:
                 self.vy *= -0.5
 
     def check_to_change_field(self, i, j):
+        """
+        Checks whether the particle needs to be transferred to another field, and does so if necessary
+        :param i: the horizontal index of the field
+        :param j: the vertical index of the field
+        """
         if (round(self.x / MAX_DIST) != i) or (round(self.y / MAX_DIST) != j):
             fields[i][j].remove(self)
             fields[round(self.x / MAX_DIST)][round(self.y / MAX_DIST)].append(self)
 
 
-LINKS, LINKS_POSSIBLE, COUPLING = [], [], []
-links, fields = [], []
+class Link:
+    """
+    This class is responsible for the connections between particles
+    """
+    def __init__(self, a, b):
+        """
+        Initializes the connection
+        :param a: the first particle of the bond
+        :param b: the second particle of the bond
+        """
+        self.a = a
+        self.b = b
+
+    def break_or_attract(self):
+        """
+        Checks whether it is necessary to break the connection. Calculates the attraction caused by the bond
+        """
+        dist2 = (self.a.x - self.b.x) ** 2 + (self.a.y - self.b.y) ** 2
+        if dist2 > MAX_DIST2 / 4:
+            self.a.links_number -= 1
+            self.b.links_number -= 1
+            self.a.bonds.remove(self.b)
+            self.b.bonds.remove(self.a)
+            links.remove(self)
+        elif dist2 > ui.NODE_RADIUS * ui.NODE_RADIUS * 4:
+            angle = math.atan2(self.a.y - self.b.y, self.a.x - self.b.x)
+            self.a.vx += math.cos(angle) * ui.LINK_FORCE * ui.SPEED
+            self.a.vy += math.sin(angle) * ui.LINK_FORCE * ui.SPEED
+            self.b.vx -= math.cos(angle) * ui.LINK_FORCE * ui.SPEED
+            self.b.vy -= math.sin(angle) * ui.LINK_FORCE * ui.SPEED
 
 
 def generate_rules():
@@ -98,6 +130,9 @@ def generate_rules():
     LINKS = [3, 0, 1]
     LINKS_POSSIBLE = [[2, 0, 1], [3, 0, 2], [3, 2, 0]]
     COUPLING = [[0, -1, -1], [1, 1, 0], [0, -1, -1]]
+    LINKS = [1, 1]
+    LINKS_POSSIBLE = [[0, 0], [0, 0]]
+    COUPLING = [[-1, 1], [-1, 0]]
     print(LINKS)
     print(LINKS_POSSIBLE)
     print(COUPLING)

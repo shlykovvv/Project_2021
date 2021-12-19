@@ -4,7 +4,7 @@ from constants import WIDTH, HEIGHT
 
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 
-NUMBER_OF_TYPES = 3
+NUMBER_OF_TYPES = 2
 NODE_COUNT = 250
 SIMULATIONS_PER_FRAME = 2
 
