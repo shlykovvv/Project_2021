@@ -54,7 +54,7 @@ def change_characteristics():
 def read_laws_from_file(input_filename):
     with open(input_filename, 'r') as input_file:
         i = 0
-        lines_conv = [0] * 7
+        lines_conv = [0] * 50
         for line in input_file:
             lines_conv[i] = line.split(',')
             for j in range(len(lines_conv[i])):
