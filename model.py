@@ -127,12 +127,6 @@ def generate_rules():
         for j in range(ui.NUMBER_OF_TYPES):
             LINKS_POSSIBLE[i].append(math.floor(random.random() * 4))
             COUPLING[i].append(math.floor(random.random() * 3 - 1))
-    LINKS = [3, 0, 1]
-    LINKS_POSSIBLE = [[2, 0, 1], [3, 0, 2], [3, 2, 0]]
-    COUPLING = [[0, -1, -1], [1, 1, 0], [0, -1, -1]]
-    LINKS = [1, 1]
-    LINKS_POSSIBLE = [[0, 0], [0, 0]]
-    COUPLING = [[-1, 1], [-1, 0]]
     print(LINKS)
     print(LINKS_POSSIBLE)
     print(COUPLING)
