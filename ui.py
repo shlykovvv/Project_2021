@@ -11,7 +11,6 @@ SIMULATIONS_PER_FRAME = 2
 NODE_RADIUS = 5
 LINK_FORCE = - 0.015
 SPEED = 4
-type_for_click = 0
 
 color_light = (170, 170, 170)
 color_dark = (120, 120, 120)
