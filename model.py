@@ -3,6 +3,7 @@ import math
 import ui
 from constants import COLORS, WIDTH, HEIGHT, MAX_DIST, BORDER
 
+
 MAX_DIST2 = MAX_DIST * MAX_DIST
 deltaW = WIDTH // MAX_DIST + 1
 deltaH = HEIGHT // MAX_DIST + 1
